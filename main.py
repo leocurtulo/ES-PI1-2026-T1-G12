@@ -29,17 +29,17 @@ while (opc != 0):
                                 case 1:
                                     funcoes_PI.cadastro_eleitores()
                                 case 2:
-                                    print("Listar eleitores")
+                                    funcoes_PI.listar_eleitores()
                                 case 3:
                                     funcoes_PI.buscar_eleitor()
                                 case 4:
                                     print("Editar eleitor")
                                 case 5:
-                                    print("Remover eleitor")
+                                    funcoes_PI.remover_eleitores()
                                 case 6:
                                     print("Tornar eleitor mesário")
                                 case 7:
-                                    print("Listar mesários")
+                                    funcoes_PI.listar_mesarios()
                                 case 0:
                                     print("Voltando...")
                                 case _:

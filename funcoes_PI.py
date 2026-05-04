@@ -62,12 +62,12 @@ def cadastro_eleitores():
     mesario = input("Você atuará como mesário? (SIM) ou (NÃO): ").strip().upper()
     valor_mesario = True if mesario == "SIM" else False
 
-    status = input("Digite o status: ").strip().capitalize()
+    
 
     sql = """
         INSERT INTO eleitores 
-        (cpf, nome_completo, titulo_eleitor, chave_acesso, is_mesario, status)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        (cpf, nome_completo, titulo_eleitor, chave_acesso, is_mesario)
+        VALUES (%s, %s, %s, %s, %s)
     """
 
     valores = (
@@ -76,7 +76,7 @@ def cadastro_eleitores():
         titulo_eleitor,
         chave_acesso,
         valor_mesario,
-        status
+        
     )
 
     conexao.cursor.execute(sql, valores)
@@ -105,16 +105,87 @@ def buscar_eleitor():
     resultado = conexao.cursor.fetchone()
 
     if resultado:
-        print("Eleitor encontrado:")
-        print(resultado)
+        print("Eleitor encontrado!")
+        print(f"\nID: {resultado[0]}")
+        print(f"Nome Completo: {resultado[2]}")
+        print(f"CPF: {resultado[1]}")
+        print(f"Título de Eleitor: {resultado[3]}")
+        print(f"Chave de Acesso: {resultado[4]}")
+        print(f"Mesário: {'Sim' if resultado[5] == 1 else 'Não'}")
+        
     else:
         print("Eleitor não encontrado")
 
 
 
 
+def listar_eleitores():
+    sql = """
+        SELECT cpf, nome_completo, titulo_eleitor, is_mesario, ja_votou
+        FROM eleitores
+    """
+    conexao.cursor.execute(sql)
+    resultados = conexao.cursor.fetchall()
+
+    if not resultados:
+        print("Nenhum eleitor cadastrado")
+        return
+    
+    for e in resultados:
+        if e[3] == 0:
+            print(f"\nNome: {e[1]}")
+            print(f"CPF: {e[0]}")
+            print(f"Título: {e[2]}")
+            print(f"Mesário: {'Sim' if e[3]== 1 else 'Não'}")
+            print(f"Já votou: {'Sim' if e[4]== 1 else 'Não'}")
 
 
 
 
+def remover_eleitores():
+    cpf = input("Digite o CPF do eleitor que deseja remover: ")
+    cpf = cpf.strip()
+    cpf = cpf.replace("-", "")
+    cpf = cpf.replace(".", "")
 
+    sql = "SELECT nome_completo FROM eleitores WHERE cpf = %s"
+    conexao.cursor.execute(sql, (cpf,))
+    eleitor = conexao.cursor.fetchone()
+
+    if not eleitor:
+        print("Eleitor não encontrado!")
+        return
+    confirmacao = input(f"Tem certeza que deseja remover {eleitor[0]}? Sim (S) ou Não (N): ")
+    confirmacao = confirmacao.upper()
+
+    if confirmacao != "S":
+        print("A remoção foi cancelada!")
+        return
+    
+    sql_delete = "DELETE FROM eleitores WHERE cpf = %s"
+    conexao.cursor.execute(sql_delete, (cpf,))
+    conexao.conexao.commit()
+
+    print("Eleitor removido com sucesso!")
+
+
+
+
+def listar_mesarios():
+    sql = """
+        SELECT cpf, nome_completo, titulo_eleitor, is_mesario, ja_votou
+        FROM eleitores WHERE is_mesario = 1
+    """
+    conexao.cursor.execute(sql)
+    resultados = conexao.cursor.fetchall()
+
+    if not resultados:
+        print("Nenhum mesário cadastrado")
+        return
+    
+    for e in resultados:
+        print(f"\nNome: {e[1]}")
+        print(f"CPF: {e[0]}")
+        print(f"Título: {e[2]}")
+        print(f"Mesário: {'Sim' if e[3]== 1 else 'Não'}")
+        print(f"Já votou: {'Sim' if e[4]== 1 else 'Não'}")
