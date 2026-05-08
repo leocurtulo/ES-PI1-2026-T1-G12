@@ -189,3 +189,59 @@ def listar_mesarios():
         print(f"Título: {e[2]}")
         print(f"Mesário: {'Sim' if e[3]== 1 else 'Não'}")
         print(f"Já votou: {'Sim' if e[4]== 1 else 'Não'}")
+
+
+def cadastrar_candidato():
+    nome = input("Digite o nome do candidato: ").strip()
+    if nome == "":
+        print("O nome do candidato deve ser preenchido.")
+        return
+    
+    numero = input("Digite o número do candidato: ").strip()
+    if not numero.isdigit():
+        print("Digite apenas números.")
+        return
+    numero_int = int(numero)
+    if numero_candidato(numero_int):
+        print("Esse número pertence a outro candidato.")
+        return
+    
+
+    partido = input("Digite o partido do candidato: ").strip()
+    if partido == "":
+        print("O partido do candidato deve ser preenchido.")
+        return
+    
+    sql = """ 
+        INSERT INTO candidatos (nome, numero, partido)
+        VALUES (%s, %s, %s)
+    """
+    valores = (nome, numero_int, partido)
+    
+    conexao.cursor.execute(sql, valores)
+    conexao.conexao.commit()
+
+    print("Candidato cadastrado com sucesso!!")
+
+    
+
+
+
+
+
+
+
+
+
+def numero_candidato(numero):
+    sql = "SELECT 1 FROM candidatos WHERE numero = %s"
+    conexao.cursor.execute(sql,(numero,))
+    resultado = conexao.cursor.fetchone()
+    if resultado:
+        return True 
+    else:
+        return False
+
+    
+        
+

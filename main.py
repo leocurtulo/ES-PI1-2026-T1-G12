@@ -53,7 +53,7 @@ while (opc != 0):
 
                             match op:
                                 case 1:
-                                    print("Cadastrar candidato")
+                                    funcoes_PI.cadastrar_candidato()
                                 case 2:
                                     print("Listar candidatos")
                                 case 3:
