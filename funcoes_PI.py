@@ -114,7 +114,7 @@ def buscar_eleitor():
         print(f"Mesário: {'Sim' if resultado[5] == 1 else 'Não'}")
         
     else:
-        print("Eleitor não encontrado")
+        print("Eleitor não encontrado.")
 
 
 
@@ -227,12 +227,6 @@ def cadastrar_candidato():
 
 
 
-
-
-
-
-
-
 def numero_candidato(numero):
     sql = "SELECT 1 FROM candidatos WHERE numero = %s"
     conexao.cursor.execute(sql,(numero,))
@@ -244,4 +238,26 @@ def numero_candidato(numero):
 
     
         
+def buscar_candidatos():
+    numero = input("Digite o número do candidato que deseja buscar: ").strip()
+    if not numero.isdigit():
+        print("Busca inválida, digite apenas números.")
+        return
+    
+    numero_int = int(numero)
+    
+    sql = """
+        SELECT nome, numero, partido
+        FROM candidatos
+        WHERE numero = %s
+    """
+    conexao.cursor.execute(sql, (numero_int,))
+    candidato = conexao.cursor.fetchone()
 
+    if candidato:
+        print("Candidato encontrado!")
+        print(f"\nNome: {candidato[0]}")
+        print(f"Número: {candidato[1]}")
+        print(f"Partido: {candidato[2]}")
+    else:
+        print("Candidato não encontrado.")

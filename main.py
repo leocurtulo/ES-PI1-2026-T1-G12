@@ -57,7 +57,7 @@ while (opc != 0):
                                 case 2:
                                     print("Listar candidatos")
                                 case 3:
-                                    print("Buscar candidato")
+                                    funcoes_PI.buscar_candidatos()
                                 case 4:
                                     print("Editar candidato")
                                 case 5:
