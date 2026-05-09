@@ -55,7 +55,7 @@ while (opc != 0):
                                 case 1:
                                     funcoes_PI.cadastrar_candidato()
                                 case 2:
-                                    print("Listar candidatos")
+                                    funcoes_PI.listar_candidatos()
                                 case 3:
                                     funcoes_PI.buscar_candidatos()
                                 case 4:

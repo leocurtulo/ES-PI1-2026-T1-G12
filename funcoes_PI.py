@@ -261,3 +261,22 @@ def buscar_candidatos():
         print(f"Partido: {candidato[2]}")
     else:
         print("Candidato não encontrado.")
+
+
+def listar_candidatos():
+    sql = """
+        SELECT nome, numero, partido
+        FROM candidatos
+    """
+    conexao.cursor.execute(sql)
+    resultados = conexao.cursor.fetchall()
+
+    if not resultados:
+        print("Nenhum candidato cadastrado.")
+        return
+    
+    for c in resultados:
+        print(f"\nNome: {c[0]}")
+        print(f"Número: {c[1]}")
+        print(f"Partido: {c[2]}")
+
