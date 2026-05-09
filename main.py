@@ -61,7 +61,7 @@ while (opc != 0):
                                 case 4:
                                     print("Editar candidato")
                                 case 5:
-                                    print("Remover candidato")
+                                    funcoes_PI.remover_candidato()
                                 case 0:
                                     print("Voltando...")
                                 case _:

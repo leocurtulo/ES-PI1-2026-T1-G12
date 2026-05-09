@@ -280,3 +280,36 @@ def listar_candidatos():
         print(f"Número: {c[1]}")
         print(f"Partido: {c[2]}")
 
+
+def remover_candidato():
+    numero = input("Digite o número do candidato que deseja remover: ")
+    numero = numero.strip()
+    if not numero.isdigit():
+        print("Digite apenas números.")
+        return
+    numero_int = int(numero)
+
+
+    sql = "SELECT nome FROM candidatos WHERE numero = %s"
+    conexao.cursor.execute(sql, (numero_int,))
+    candidato = conexao.cursor.fetchone()
+
+    if not candidato:
+        print("Candidato não encontrado.")
+        return
+
+    confirmacao = input(f"Tem certeza que deseja remover {candidato[0]}? Sim (S) ou Não (N): ")
+    confirmacao = confirmacao.upper()
+
+    if confirmacao != "S":
+        print("A remoção foi cancelada!")
+        return
+    
+    sql_delete = "DELETE FROM candidatos WHERE numero = %s"
+    conexao.cursor.execute(sql_delete, (numero_int,))
+    conexao.conexao.commit()
+
+    print("Candidato removido com sucesso!")
+    
+
+
