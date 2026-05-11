@@ -1,5 +1,6 @@
 import conexao
 from za import validar_titulo
+import random
 
 
 def validar_cpf(cpf):
@@ -57,7 +58,12 @@ def cadastro_eleitores():
 
     print("CPF válido.")
 
-    chave_acesso = input("Digite sua chave de acesso: ").strip()
+    chave = chave_acesso(nome)
+    if chave == "":
+        print("Cadastro cancelado.")
+        return
+    print(f"SUA CHAVE DE ACESSO: {chave}")
+    print("Guarde sua chave de acesso, ela será necessária no momento da votação!")
 
     mesario = input("Você atuará como mesário? (SIM) ou (NÃO): ").strip().upper()
     valor_mesario = True if mesario == "SIM" else False
@@ -74,7 +80,7 @@ def cadastro_eleitores():
         cpf,
         nome,
         titulo_eleitor,
-        chave_acesso,
+        chave,
         valor_mesario,
         
     )
@@ -313,3 +319,19 @@ def remover_candidato():
     
 
 
+def chave_acesso(nome_completo):
+    nome_completo = nome_completo.strip()
+    nome_completo = nome_completo.split()
+    partes_nome = nome_completo
+
+    if len(partes_nome) < 2:
+        print ("Deve ser digitado o nome e o sobrenome")
+        return 
+    
+    
+    primeiro_nome = partes_nome [0]
+    segundo_nome = partes_nome [1]
+
+    letras = primeiro_nome[:2].upper() + segundo_nome[0].upper()
+    numeros = f"{random.randint(0, 9999):04d}"
+    return letras + numeros
