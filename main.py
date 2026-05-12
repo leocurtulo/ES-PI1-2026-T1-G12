@@ -82,26 +82,19 @@ while (opc != 0):
 
                 match sub:
 
-                    # ABERTURA
+                    
                     case 1:
-                        op = -1
-                        while (op != 0):
-                            op = menu.menu_abertura()
-
-                            match op:
-                                case 1:
-                                    print("Votar")
-                                case 2:
-                                    print("Encerrar votação")
-                                case 0:
-                                    print("Voltando...")
-                                case _:
-                                    print("Opção inválida.")
-
-                    # AUDITORIA
+                        print("Abrir sistema de votação")
+                        
                     case 2:
+                        print("Votar")
+
+                    case 3:
+                        print("Encerrar sistema de votação")
+
+                    case 4:
                         op = -1
-                        while (op != 0):
+                        while op != 0:
                             op = menu.menu_auditoria()
 
                             match op:
@@ -114,11 +107,11 @@ while (opc != 0):
                                 case _:
                                     print("Opção inválida.")
 
-                    # RESULTADOS
-                    case 3:
+                    case 5:
                         op = -1
-                        while (op != 0):
+                        while op != 0:
                             op = menu.menu_resultados()
+                        
 
                             match op:
                                 case 1:
@@ -134,8 +127,9 @@ while (opc != 0):
                                 case _:
                                     print("Opção inválida.")
 
-                    case 0:
-                        print("Voltando...")
+
+
+
 
                     case _:
                         print("Opção inválida.")
