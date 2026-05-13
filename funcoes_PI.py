@@ -694,7 +694,7 @@ def votar():
     else:
         numero_str=str(numero).zfill(2)
 
-    aleatorio=f"{random.radint(0,99999):05d}"
+    aleatorio=f"{random.randint(0,99999):05d}"
     protocolo =f"V{letras}26{numero_str}{aleatorio}"  
     
     data_hora = datetime.now()
