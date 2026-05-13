@@ -439,3 +439,35 @@ def encerrar_votacao():
 
     print("Votação encerrada com sucesso!")
 
+
+
+
+
+
+def registrar_ocorrencia(tipo, descricao, cpf_eleitor=None):
+    sql = """
+        INSERT INTO auditoria (tipo, descricao, cpf_eleitor)
+        VALUES (%s, %s, %s)
+    """
+    valores = (tipo, descricao, cpf_eleitor)
+    conexao.cursor.execute(sql, valores)
+    conexao.conexao.commit()
+    print("Ocorrência registrada na auditoria.")
+    registrar_ocorrencia("TENTATIVA DUPLA VOTO", "Eleitor tentou votar novamente.")
+    registrar_ocorrencia("ERRO CPF", "CPF inválido informado no cadastro.")
+
+def listar_ocorrencias():
+    sql = "SELECT id, data_hora, tipo, descricao, cpf_eleitor FROM auditoria ORDER BY data_hora DESC"
+    conexao.cursor.execute(sql)
+    resultados = conexao.cursor.fetchall()
+
+    if not resultados:
+        print("Nenhuma ocorrência registrada.")
+        return
+    
+    for o in resultados:
+        print(f"\nID: {o[0]}")
+        print(f"Data/Hora: {o[1]}")
+        print(f"Tipo: {o[2]}")
+        print(f"Descrição: {o[3]}")
+        print(f"CPF Eleitor: {o[4] if o[4] else 'N/A'}")
