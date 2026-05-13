@@ -1,6 +1,9 @@
 import conexao
 from za import validar_titulo
 import random
+from datetime import datetime
+votacao_aberta = False
+
 
 
 def validar_cpf(cpf):
@@ -378,9 +381,9 @@ def validar_mesario(titulo_eleitor, cpf4, chave):
 
 
 def zerezima():
-    print("\n=== REALLIZANDO A ZERÉZIMA ===")
+    print("\n=== REALIZANDO A ZERÉZIMA ===")
 
-    conexao.cursor.execute("DELETE FROM votos")# limpar votos
+    conexao.cursor.execute("DELETE FROM voto")# limpar votos
     conexao.conexao.commit()
 
     sql = "SELECT nome, numero FROM candidatos ORDER BY nome"
@@ -398,6 +401,8 @@ def zerezima():
 
 
 def abrir_votacao():
+    global votacao_aberta
+
     titulo = input("Título: ")
     cpf4 = input("CPF (4 dígitos): ")
     chave = input("Chave: ")
@@ -405,9 +410,21 @@ def abrir_votacao():
     if not validar_mesario(titulo, cpf4, chave):
         print("Acesso negado.")
         return False
+    
+    if votacao_aberta:
+        print("A votação já está aberta.")
+        registrar_log("Tentativa de abrir votação já aberta..")
+        return False
+    
 
     print("Mesário autenticado com sucesso!")
     zerezima()
+
+    votacao_aberta = True
+
+    registrar_log("Abertura da votação concluída.")
+
+    print("Votação Aberta.")
 
     return True
 
@@ -415,7 +432,10 @@ def abrir_votacao():
 
 
 def encerrar_votacao():
-    print("\n=== ENCERRAR VITAÇÃO ===")
+    global votacao_aberta
+
+
+    print("\n=== ENCERRAR VOTAÇÃO ===")
 
     titulo = input("Título de eleitor: ")
     cpf4 = input("4 primeiros dígitos do CPF: ")
@@ -423,7 +443,13 @@ def encerrar_votacao():
 
     if not validar_mesario(titulo, cpf4, chave):
         print("Validação não realizada")
+        registrar_log("Tentativa de acesso negado.")
         return
+    
+    if not votacao_aberta:
+        print("A votação já está encerrada.")
+        return
+    
 
     confirm = input("Deseja realmente encerrar? (Sim/Não): ").lower()
 
@@ -436,46 +462,20 @@ def encerrar_votacao():
     if chave2 != chave:
         print("Chave incorreta")
         return
+    
+    votacao_aberta = False
+
+    registrar_log("Encerramento da votação concluído.")
 
     print("Votação encerrada com sucesso!")
 
 
 
-
-
-
-def registrar_ocorrencia(tipo, descricao, cpf_eleitor=None):
-    sql = """
-        INSERT INTO auditoria (tipo, descricao, cpf_eleitor)
-        VALUES (%s, %s, %s)
-    """
-    valores = (tipo, descricao, cpf_eleitor)
-    conexao.cursor.execute(sql, valores)
-    conexao.conexao.commit()
-    print("Ocorrência registrada na auditoria.")
-    registrar_ocorrencia("TENTATIVA DUPLA VOTO", "Eleitor tentou votar novamente.")
-    registrar_ocorrencia("ERRO CPF", "CPF inválido informado no cadastro.")
-
-def listar_ocorrencias():
-    sql = "SELECT id, data_hora, tipo, descricao, cpf_eleitor FROM auditoria ORDER BY data_hora DESC"
-    conexao.cursor.execute(sql)
-    resultados = conexao.cursor.fetchall()
-
-    if not resultados:
-        print("Nenhuma ocorrência registrada.")
-        return
-    
-    for o in resultados:
-        print(f"\nID: {o[0]}")
-        print(f"Data/Hora: {o[1]}")
-        print(f"Tipo: {o[2]}")
-        print(f"Descrição: {o[3]}")
-        print(f"CPF Eleitor: {o[4] if o[4] else 'N/A'}")
-
-
-from datetime import datetime
-
 def votar():
+    if not votacao_aberta:
+        print("A votação está fechada.")
+        return
+
     print("\n=== IDENTIFICAÇÃO DO ELEITOR ===")
 
     titulo = input("Título de eleitor: ").strip()
@@ -501,6 +501,7 @@ def votar():
 
     if eleitor[1] == 1:
         print("Este eleitor já votou.")
+        registrar_log("Tentativa de votar novamente (voto duplo).")
         return
 
     
@@ -547,3 +548,26 @@ def votar():
 
     print("\nVOTO REGISTRADO COM SUCESSO")
     print(f"Protocolo de votação: {protocolo}")
+    registrar_log("Voto realizado.")
+
+
+
+
+
+def registrar_log(mensagem):
+    data_hora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    arquivo = open("auditoria.txt", "a", encoding="utf-8")
+    arquivo.write("[" + data_hora + "] " + mensagem + "\n")
+    arquivo.close()
+
+
+def exibir_logs():
+    arquivo = open("auditoria.txt", "r", encoding="utf-8")
+    conteudo = arquivo.read()
+
+    print("\n=== LOGS DE AUDITORIA ===")
+    print(conteudo)
+
+    arquivo.close()
+

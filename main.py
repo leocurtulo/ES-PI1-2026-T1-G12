@@ -84,13 +84,13 @@ while (opc != 0):
 
                     
                     case 1:
-                        print("Abrir sistema de votação")
+                        funcoes_PI.abrir_votacao()
                         
                     case 2:
-                        print("Votar")
+                        funcoes_PI.votar()
 
                     case 3:
-                        print("Encerrar sistema de votação")
+                        funcoes_PI.encerrar_votacao()
 
                     case 4:
                         op = -1
@@ -99,7 +99,7 @@ while (opc != 0):
 
                             match op:
                                 case 1:
-                                    print("Logs")
+                                    funcoes_PI.exibir_logs()
                                 case 2:
                                     print("Protocolos")
                                 case 0:
