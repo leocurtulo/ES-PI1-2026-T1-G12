@@ -471,3 +471,79 @@ def listar_ocorrencias():
         print(f"Tipo: {o[2]}")
         print(f"Descrição: {o[3]}")
         print(f"CPF Eleitor: {o[4] if o[4] else 'N/A'}")
+
+
+from datetime import datetime
+
+def votar():
+    print("\n=== IDENTIFICAÇÃO DO ELEITOR ===")
+
+    titulo = input("Título de eleitor: ").strip()
+    cpf = input("4 primeiros dígitos do CPF: ").strip()
+    chave = input("Chave de acesso: ").strip()
+
+   
+    sql = """
+        SELECT id, ja_votou
+        FROM eleitores
+        WHERE titulo_eleitor = %s
+          AND cpf LIKE %s
+          AND chave_acesso = %s
+    """
+    valores = (titulo, cpf + "%", chave)
+
+    conexao.cursor.execute(sql, valores)
+    eleitor = conexao.cursor.fetchone()
+
+    if not eleitor:
+        print("Eleitor não encontrado ou dados inválidos.")
+        return
+
+    if eleitor[1] == 1:
+        print("Este eleitor já votou.")
+        return
+
+    
+    numero = input("\nDigite o número do candidato: ").strip()
+
+    sql = """
+        SELECT id, nome, partido
+        FROM candidatos
+        WHERE numero = %s
+    """
+    conexao.cursor.execute(sql, (numero,))
+    candidato = conexao.cursor.fetchone()
+
+   
+    if candidato:
+        print(f"Candidato: {candidato[1]} - {candidato[2]}")
+        confirmar = input("Confirmar voto? (S/N): ").upper()
+        if confirmar != "S":
+            print("Voto cancelado.")
+            return
+        candidato_id = candidato[0]
+    else:
+        print("Número inválido. Voto será NULO.")
+        confirmar = input("Confirmar voto nulo? (S/N): ").upper()
+        if confirmar != "S":
+            print("Voto cancelado.")
+            return
+        candidato_id = None  
+    
+    protocolo = f"V{random.randint(100000, 999999)}"
+    data_hora = datetime.now()
+
+    sql_voto = """
+        INSERT INTO voto (candidato_id, data_hora, protocolo)
+        VALUES (%s, %s, %s)
+    """
+    conexao.cursor.execute(sql_voto, (candidato_id, data_hora, protocolo))
+
+    
+    sql_update = "UPDATE eleitores SET ja_votou = TRUE WHERE id = %s"
+    conexao.cursor.execute(sql_update, (eleitor[0],))
+
+    conexao.conexao.commit()
+
+    print("\nVOTO REGISTRADO COM SUCESSO")
+    print(f"Protocolo de votação: {protocolo}")
