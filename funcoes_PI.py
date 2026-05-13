@@ -3,6 +3,7 @@ from za import validar_titulo
 import random
 from datetime import datetime
 votacao_aberta = False
+import string
 
 
 
@@ -687,8 +688,17 @@ def votar():
             return
         candidato_id = None  
     
-    protocolo = f"V{random.randint(100000, 999999)}"
+    letras=''.join(random.choice(string.asciiuppercase) for _ in range(2))
+    if candidato_id is None:
+        numero_str="00"
+    else:
+        numero_str=str(numero).zfill(2)
+
+    aleatorio=f"{random.radint(0,99999):05d}"
+    protocolo =f"V{letras}26{numero_str}{aleatorio}"  
+    
     data_hora = datetime.now()
+
 
     sql_voto = """
         INSERT INTO voto (candidato_id, data_hora, protocolo)
@@ -726,4 +736,8 @@ def exibir_logs():
     print(conteudo)
 
     arquivo.close()
+
+
+
+
 
