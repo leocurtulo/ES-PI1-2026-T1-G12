@@ -688,7 +688,7 @@ def votar():
             return
         candidato_id = None  
     
-    letras=''.join(random.choice(string.asciiuppercase) for _ in range(2))
+    letras=''.join(random.choice(string.ascii_uppercase) for _ in range(2))
     if candidato_id is None:
         numero_str="00"
     else:
