@@ -741,3 +741,178 @@ def exibir_logs():
 
 
 
+
+def editar_candidato():
+
+    print("\n=== EDITAR CANDIDATO ===")
+
+    numero = input("Digite o número do candidato: ").strip()
+
+    while not numero.isdigit():
+        print("Digite apenas números.")
+        numero = input("Digite o número do candidato: ").strip()
+
+    numero_int = int(numero)
+
+    sql = "SELECT id, nome, numero, partido FROM candidatos WHERE numero = %s"
+    conexao.cursor.execute(sql, (numero_int,))
+    candidato = conexao.cursor.fetchone()
+
+    if not candidato:
+        print("Candidato não encontrado.")
+        return
+
+    print(f"\nCandidato encontrado: {candidato[1]}")
+
+    nome = input("Digite o novo nome: ").strip()
+
+    while nome == "":
+        print("Nome inválido.")
+        nome = input("Digite o novo nome: ").strip()
+
+    novo_numero = input("Digite o novo número: ").strip()
+
+    while not novo_numero.isdigit():
+        print("Digite apenas números.")
+        novo_numero = input("Digite o novo número: ").strip()
+
+    novo_numero_int = int(novo_numero)
+
+    numero_existe = True
+
+    while numero_existe:
+        sql = "SELECT id FROM candidatos WHERE numero = %s"
+        conexao.cursor.execute(sql, (novo_numero_int,))
+        existente = conexao.cursor.fetchone()
+
+        if existente and existente[0] != candidato[0]:
+            print("Esse número já pertence a outro candidato.")
+
+            novo_numero = input("Digite outro número: ").strip()
+
+            while not novo_numero.isdigit():
+                print("Digite apenas números.")
+                novo_numero = input("Digite o número: ").strip()
+
+            novo_numero_int = int(novo_numero)
+        else:
+            numero_existe = False
+
+    partido = input("Digite o novo partido: ").strip()
+
+    while partido == "":
+        print("Partido inválido.")
+        partido = input("Digite o novo partido: ").strip()
+
+    confirm = input("Deseja salvar? (S/N): ").strip().upper()
+
+    while confirm not in ["S", "N"]:
+        print("Digite S ou N.")
+        confirm = input("(S/N): ").strip().upper()
+
+    if confirm != "S":
+        print("Edição cancelada.")
+        return
+
+    sql_update = """
+        UPDATE candidatos
+        SET nome = %s, numero = %s, partido = %s
+        WHERE id = %s
+    """
+
+    valores = (nome, novo_numero_int, partido, candidato[0])
+
+    conexao.cursor.execute(sql_update, valores)
+    conexao.conexao.commit()
+
+    print("Candidato atualizado com sucesso!")
+
+
+def editar_eleitor():
+
+    print("\n=== EDITAR ELEITOR ===")
+
+    cpf = input("Digite o CPF: ").strip()
+    cpf = cpf.replace(".", "").replace("-", "")
+
+    while not cpf.isdigit():
+        print("Digite apenas números.")
+        cpf = input("Digite o CPF: ").strip()
+        cpf = cpf.replace(".", "").replace("-", "")
+
+    sql = "SELECT id, nome_completo, titulo_eleitor, is_mesario FROM eleitores WHERE cpf = %s"
+    conexao.cursor.execute(sql, (cpf,))
+    eleitor = conexao.cursor.fetchone()
+
+    if not eleitor:
+        print("Eleitor não encontrado.")
+        return
+
+    print(f"\nEleitor encontrado: {eleitor[1]}")
+
+    nome = input("Digite o novo nome: ").strip()
+
+    while nome == "":
+        print("Nome inválido.")
+        nome = input("Digite o novo nome: ").strip()
+
+    titulo = input("Digite o novo título: ").strip()
+    titulo = "".join(t for t in titulo if t.isdigit())
+
+    while not validar_titulo(titulo):
+        print("Título inválido.")
+        titulo = input("Digite o novo título: ").strip()
+        titulo = "".join(t for t in titulo if t.isdigit())
+
+    titulo_existe = True
+
+    while titulo_existe:
+        sql = "SELECT id FROM eleitores WHERE titulo_eleitor = %s"
+        conexao.cursor.execute(sql, (titulo,))
+        existente = conexao.cursor.fetchone()
+
+        if existente and existente[0] != eleitor[0]:
+            print("Esse título já pertence a outro eleitor.")
+
+            titulo = input("Digite outro título: ").strip()
+            titulo = "".join(t for t in titulo if t.isdigit())
+
+            while not validar_titulo(titulo):
+                print("Título inválido.")
+                titulo = input("Digite o novo título: ").strip()
+                titulo = "".join(t for t in titulo if t.isdigit())
+        else:
+            titulo_existe = False
+
+    mesario = input("Deseja ser mesário? (S/N): ").strip().upper()
+
+    while mesario not in ["S", "N"]:
+        print("Digite S ou N.")
+        mesario = input("(S/N): ").strip().upper()
+
+    valor_mesario = True if mesario == "S" else False
+
+    confirm = input("Deseja salvar? (S/N): ").strip().upper()
+
+    while confirm not in ["S", "N"]:
+        print("Digite S ou N.")
+        confirm = input("(S/N): ").strip().upper()
+
+    if confirm != "S":
+        print("Edição cancelada.")
+        return
+
+    sql_update = """
+        UPDATE eleitores
+        SET nome_completo = %s, titulo_eleitor = %s, is_mesario = %s
+        WHERE id = %s
+    """
+
+    valores = (nome, titulo, valor_mesario, eleitor[0])
+
+    conexao.cursor.execute(sql_update, valores)
+    conexao.conexao.commit()
+
+    print("Eleitor atualizado com sucesso!")
+
+

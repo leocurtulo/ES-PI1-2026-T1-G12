@@ -33,7 +33,7 @@ while (opc != 0):
                                 case 3:
                                     funcoes_PI.buscar_eleitor()
                                 case 4:
-                                    print("Editar eleitor")
+                                    funcoes_PI.editar_eleitor()
                                 case 5:
                                     funcoes_PI.remover_eleitores()
                                 case 6:
@@ -59,7 +59,7 @@ while (opc != 0):
                                 case 3:
                                     funcoes_PI.buscar_candidatos()
                                 case 4:
-                                    print("Editar candidato")
+                                    funcoes_PI.editar_candidato()
                                 case 5:
                                     funcoes_PI.remover_candidato()
                                 case 0:
