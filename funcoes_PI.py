@@ -335,3 +335,107 @@ def chave_acesso(nome_completo):
     letras = primeiro_nome[:2].upper() + segundo_nome[0].upper()
     numeros = f"{random.randint(0, 9999):04d}"
     return letras + numeros
+
+
+
+
+
+
+def validar_mesario(titulo_eleitor, cpf4, chave):
+    sql = """
+        SELECT cpf, chave_acesso, is_mesario
+        FROM eleitores
+        WHERE titulo_eleitor = %s
+    """
+    conexao.cursor.execute(sql, (titulo_eleitor,))
+    resultado = conexao.cursor.fetchone()
+
+    if not resultado:
+        return False
+
+    cpf_banco = resultado[0]
+    chave_banco = resultado[1]
+    is_mesario = resultado[2]
+
+    # valida 4 primeiros dígitos do CPF
+    if cpf_banco[:4] != cpf4:
+        return False
+
+    # valida chave
+    if chave_banco != chave:
+        return False
+
+    # valida se é mesário
+    if is_mesario != 1:
+        return False
+
+    return True
+
+
+
+
+
+
+
+def zerezima():
+    print("\n=== REALLIZANDO A ZERÉZIMA ===")
+
+    conexao.cursor.execute("DELETE FROM votos")# limpar votos
+    conexao.conexao.commit()
+
+    sql = "SELECT nome, numero FROM candidatos ORDER BY nome"
+    conexao.cursor.execute(sql)
+    candidatos = conexao.cursor.fetchall()
+
+    for c in candidatos:
+        print(f"{c[0]} ({c[1]}) - 0 votos")
+
+    print("\nZerézima realizada com sucesso, todos os votos foram zerados.")
+
+
+
+
+
+
+def abrir_votacao():
+    titulo = input("Título: ")
+    cpf4 = input("CPF (4 dígitos): ")
+    chave = input("Chave: ")
+
+    if not validar_mesario(titulo, cpf4, chave):
+        print("Acesso negado.")
+        return False
+
+    print("Mesário autenticado com sucesso!")
+    zerezima()
+
+    return True
+
+
+
+
+def encerrar_votacao():
+    print("\n=== ENCERRAR VITAÇÃO ===")
+
+    titulo = input("Título de eleitor: ")
+    cpf4 = input("4 primeiros dígitos do CPF: ")
+    chave = input("Chave de acesso: ")
+
+    if not validar_mesario(titulo, cpf4, chave):
+        print("Validação não realizada")
+        return
+
+    confirm = input("Deseja realmente encerrar? (Sim/Não): ").lower()
+
+    if confirm != "sim":
+        print("Encerramento cancelado")
+        return
+
+    chave2 = input("Digite novamente a chave de acesso: ")
+
+    if chave2 != chave:
+        print("Chave incorreta")
+        return
+
+    print("Votação encerrada com sucesso!")
+
