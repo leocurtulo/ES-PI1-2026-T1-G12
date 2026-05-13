@@ -43,33 +43,91 @@ def validar_cpf(cpf):
 
 def cadastro_eleitores():
     nome = input("Digite Seu nome completo: ").strip()
+    while nome == "":
+        print("Nome inválido. Tente novamente.")
+        nome = input("Digite Seu nome completo: ").strip()
+    
 
     titulo_eleitor = input("Digite seu titulo de eleitor: ").strip()
     titulo_eleitor = titulo_eleitor.replace(" ", "")
-    if not validar_titulo(titulo_eleitor):
-        print ("Título inváldo. Cadastro não realizado.")
-        return
+    while not validar_titulo(titulo_eleitor):
+        print ("Título inváldo. Tente novamente.")
+        titulo_eleitor = input("Digite seu titulo de eleitor: ").strip()
+        titulo_eleitor = titulo_eleitor.replace(" ", "")
+
+    titulo_existe = True
+
+    while titulo_existe:
+        sql = "SELECT titulo_eleitor FROM eleitores WHERE titulo_eleitor = %s"
+        conexao.cursor.execute(sql, (titulo_eleitor,))
+        titulo_existente = conexao.cursor.fetchone()
+
+        if titulo_existente:
+            print("Este título de eleitor já está cadastrado. Digite outro título.")
+            titulo_eleitor = input("Digite seu titulo de eleitor: ").strip()
+            titulo_eleitor = titulo_eleitor.replace(" ", "")
+
+            while not validar_titulo(titulo_eleitor):
+                print ("Título inváldo. Tente novamente.")
+                titulo_eleitor = input("Digite seu titulo de eleitor: ").strip()
+                titulo_eleitor = titulo_eleitor.replace(" ", "")
+
+        else:
+            titulo_existe = False
+
 
 
     cpf = input("Digite seu CPF: ").strip()
     cpf = cpf.replace(".", "").replace("-", "")
 
     
-    if not validar_cpf(cpf):
-        print("CPF inválido. Cadastro não realizado.")
-        return  
+    while not validar_cpf(cpf):
+        print("CPF inválido. Tente novamente.")
+        cpf = input("Digite seu CPF: ").strip()
+        cpf = cpf.replace(".", "").replace("-", "")
+
+    cpf_existe = True
+
+    while cpf_existe:
+        sql = "SELECT cpf FROM eleitores WHERE cpf = %s"
+        conexao.cursor.execute(sql, (cpf,))
+        existente = conexao.cursor.fetchone()
+
+        if existente:
+            print("Este CPF já está cadastrado. Digite outro CPF.")
+            cpf = input("Digite seu CPF: ").strip()
+            cpf = cpf.replace(".", "").replace("-", "")
+
+            while not validar_cpf(cpf):
+                print("CPF inválido. Tente novamente.")
+                cpf = input("Digite seu CPF: ").strip()
+                cpf = cpf.replace(".", "").replace("-", "")
+        
+        else:
+            cpf_existe = False
+
 
     print("CPF válido.")
 
     chave = chave_acesso(nome)
-    if chave == "":
-        print("Cadastro cancelado.")
-        return
+
+    while chave == "":
+        print("Nome inválido. Digite o nome e o sobrenome.")
+        nome = input("Digite Seu nome completo: ").strip()
+        chave = chave_acesso(nome)
+
+
+
     print(f"SUA CHAVE DE ACESSO: {chave}")
     print("Guarde sua chave de acesso, ela será necessária no momento da votação!")
 
-    mesario = input("Você atuará como mesário? (SIM) ou (NÃO): ").strip().upper()
-    valor_mesario = True if mesario == "SIM" else False
+    mesario = input("Você atuará como mesário? SIM (S) ou NÃO (N): ").strip().upper()
+    while mesario not in ["S", "N"]:
+        print("Digite S para SIM ou N para NÃO.")
+        mesario = input("(S/N): ").strip()
+        mesario = mesario.upper()
+
+    valor_mesario = True if mesario == "S" else False
 
     
 
@@ -103,6 +161,12 @@ def buscar_eleitor():
     cpf = cpf.strip()
     cpf = cpf.replace(".", "")
     cpf = cpf.replace("-", "")
+
+    while not cpf.isdigit():
+        print("CPF inválido.")
+        cpf = input("Digite o CPF para buscar: ").strip()
+        cpf = cpf.replace(".", "")
+        cpf = cpf.replace("-", "")
 
 
     sql = "SELECT * FROM eleitores WHERE cpf = %s"
@@ -164,8 +228,13 @@ def remover_eleitores():
     if not eleitor:
         print("Eleitor não encontrado!")
         return
-    confirmacao = input(f"Tem certeza que deseja remover {eleitor[0]}? Sim (S) ou Não (N): ")
+    confirmacao = input(f"Tem certeza que deseja remover {eleitor[0]}? Sim (S) ou Não (N): ").strip()
     confirmacao = confirmacao.upper()
+
+    while confirmacao not in ["S", "N"]:
+        print("Digite S para SIM ou N para NÃO.")
+        confirmacao = input("(S/N): ").strip()
+        confirmacao = confirmacao.upper()
 
     if confirmacao != "S":
         print("A remoção foi cancelada!")
@@ -202,24 +271,32 @@ def listar_mesarios():
 
 def cadastrar_candidato():
     nome = input("Digite o nome do candidato: ").strip()
-    if nome == "":
-        print("O nome do candidato deve ser preenchido.")
-        return
+    while nome == "":
+        print("O nome do candidato deve ser preenchido. Tente novamente.")
+        nome = input("Digite o nome do candidato: ").strip()
     
     numero = input("Digite o número do candidato: ").strip()
-    if not numero.isdigit():
-        print("Digite apenas números.")
-        return
+    while not numero.isdigit():
+        print("Digite apenas números. Tente novamente")
+        numero = input("Digite o número do candidato: ").strip()
+        
     numero_int = int(numero)
-    if numero_candidato(numero_int):
+    while numero_candidato(numero_int):
         print("Esse número pertence a outro candidato.")
-        return
+        numero = input("Digite outro número: ").strip()
+        
+        while not numero.isdigit():
+            print("Digite apenas números.")
+            numero = input("Digite o número do candidato: ").strip()
+
+        numero_int = int(numero)
+
     
 
     partido = input("Digite o partido do candidato: ").strip()
-    if partido == "":
+    while partido == "":
         print("O partido do candidato deve ser preenchido.")
-        return
+        partido = input("Digite o partido do candidato: ").strip()
     
     sql = """ 
         INSERT INTO candidatos (nome, numero, partido)
@@ -249,10 +326,10 @@ def numero_candidato(numero):
         
 def buscar_candidatos():
     numero = input("Digite o número do candidato que deseja buscar: ").strip()
-    if not numero.isdigit():
-        print("Busca inválida, digite apenas números.")
-        return
-    
+    while not numero.isdigit():
+        print("Busca inválida, digite apenas números. tente novamente.")
+        numero = input("Digite o número do candidato que deseja buscar: ").strip()
+        
     numero_int = int(numero)
     
     sql = """
@@ -293,9 +370,11 @@ def listar_candidatos():
 def remover_candidato():
     numero = input("Digite o número do candidato que deseja remover: ")
     numero = numero.strip()
-    if not numero.isdigit():
-        print("Digite apenas números.")
-        return
+    while not numero.isdigit():
+        print("Digite apenas números. Tente novamente.")
+        numero = input("Digite o número do candidato que deseja remover: ")
+        numero = numero.strip()
+
     numero_int = int(numero)
 
 
@@ -307,8 +386,13 @@ def remover_candidato():
         print("Candidato não encontrado.")
         return
 
-    confirmacao = input(f"Tem certeza que deseja remover {candidato[0]}? Sim (S) ou Não (N): ")
+    confirmacao = input(f"Tem certeza que deseja remover {candidato[0]}? Sim (S) ou Não (N): ").strip()
     confirmacao = confirmacao.upper()
+
+    while confirmacao not in ["S", "N"]:
+        print("Digite S para SIM ou N para NÃO.")
+        confirmacao = input("(S/N): ").strip()
+        confirmacao = confirmacao.upper()
 
     if confirmacao != "S":
         print("A remoção foi cancelada!")
@@ -329,7 +413,7 @@ def chave_acesso(nome_completo):
 
     if len(partes_nome) < 2:
         print ("Deve ser digitado o nome e o sobrenome")
-        return 
+        return ""
     
     
     primeiro_nome = partes_nome [0]
@@ -404,8 +488,24 @@ def abrir_votacao():
     global votacao_aberta
 
     titulo = input("Título: ")
+
+    while titulo == "":
+        print("Título inválido. Tente novamente.")
+        titulo = input("Título: ").strip()
+
+
     cpf4 = input("CPF (4 dígitos): ")
+
+    while not cpf4.isdigit() or len(cpf4) != 4:
+        print("CPF inválido. Digite 4 números.")
+        cpf4 = input("CPF (4 dígitos): ").strip()
+
+
     chave = input("Chave: ")
+
+    while chave == "":
+        print("Chave inválida.")
+        chave = input("Chave: ").strip()
 
     if not validar_mesario(titulo, cpf4, chave):
         print("Acesso negado.")
@@ -413,7 +513,7 @@ def abrir_votacao():
     
     if votacao_aberta:
         print("A votação já está aberta.")
-        registrar_log("Tentativa de abrir votação já aberta..")
+        registrar_log("Tentativa de abrir votação já aberta.")
         return False
     
 
@@ -438,8 +538,24 @@ def encerrar_votacao():
     print("\n=== ENCERRAR VOTAÇÃO ===")
 
     titulo = input("Título de eleitor: ")
+
+    while titulo == "":
+        print("Título inválido. Tente novamente.")
+        titulo = input("Título: ").strip()
+
+        
     cpf4 = input("4 primeiros dígitos do CPF: ")
+
+    while not cpf4.isdigit() or len(cpf4) != 4:
+        print("CPF inválido. Digite 4 números.")
+        cpf4 = input("CPF (4 dígitos): ").strip()
+
     chave = input("Chave de acesso: ")
+
+    while chave == "":
+        print("Chave inválida.")
+        chave = input("Chave: ").strip()
+
 
     if not validar_mesario(titulo, cpf4, chave):
         print("Validação não realizada")
@@ -451,13 +567,22 @@ def encerrar_votacao():
         return
     
 
-    confirm = input("Deseja realmente encerrar? (Sim/Não): ").lower()
+    confirm = input("Deseja realmente encerrar? SIM (S) ou NÃO(N): ").strip().upper()
 
-    if confirm != "sim":
+    while confirm not in ["S", "N"]:
+        print("Digite apenas SIM ou NÃO.")
+        confirm = input("Deseja realmente encerrar? (SIM/NÃO): ").strip().upper()
+
+
+    if confirm != "S":
         print("Encerramento cancelado")
         return
 
     chave2 = input("Digite novamente a chave de acesso: ")
+
+    while chave == "":
+        print("Chave inválida.")
+        chave2 = input("Digite novamente a chave de acesso: ").strip()
 
     if chave2 != chave:
         print("Chave incorreta")
@@ -479,8 +604,22 @@ def votar():
     print("\n=== IDENTIFICAÇÃO DO ELEITOR ===")
 
     titulo = input("Título de eleitor: ").strip()
+
+    while titulo == "":
+        print("Título inválido.")
+        titulo = input("Título de eleitor: ").strip()
+
     cpf = input("4 primeiros dígitos do CPF: ").strip()
+
+    while not cpf.isdigit() or len(cpf) != 4:
+        print("CPF inválido. Digite 4 números.")
+        cpf = input("4 primeiros dígitos do CPF: ").strip()
+
     chave = input("Chave de acesso: ").strip()
+
+    while chave == "":
+        print("Chave inválida.")
+        chave = input("Chave de acesso: ").strip()
 
    
     sql = """
@@ -507,6 +646,10 @@ def votar():
     
     numero = input("\nDigite o número do candidato: ").strip()
 
+    while not numero.isdigit():
+        print("Número inválido. Digite apenas números.")
+        numero = input("Digite o número do candidato: ").strip()
+
     sql = """
         SELECT id, nome, partido
         FROM candidatos
@@ -518,14 +661,27 @@ def votar():
    
     if candidato:
         print(f"Candidato: {candidato[1]} - {candidato[2]}")
-        confirmar = input("Confirmar voto? (S/N): ").upper()
+        confirmar = input("Confirmar voto? SIM (S) ou NÃO(N): ").upper().strip()
+
+        while confirmar not in ["S", "N"]:
+            print("Digite S para SIM ou N para NÃO.")
+            confirmar = input("(S/N): ").strip().upper()
+
+
         if confirmar != "S":
             print("Voto cancelado.")
             return
         candidato_id = candidato[0]
+
+
     else:
         print("Número inválido. Voto será NULO.")
-        confirmar = input("Confirmar voto nulo? (S/N): ").upper()
+        confirmar = input("Confirmar voto nulo? SIM (S) ou NÃO(N): ").upper().strip()
+
+        while confirmar not in ["S", "N"]:
+            print("Digite S para SIM ou N para NÃO.")
+            confirmar = input("(S/N): ").strip().upper()
+
         if confirmar != "S":
             print("Voto cancelado.")
             return

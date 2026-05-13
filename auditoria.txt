@@ -1,1 +1,6 @@
 [2026-05-12 23:29:05] Abertura da votação concluída.
+[2026-05-13 11:28:56] Abertura da votação concluída.
+[2026-05-13 11:31:23] Voto realizado.
+[2026-05-13 11:32:06] Tentativa de votar novamente (voto duplo).
+[2026-05-13 11:32:28] Tentativa de acesso negado.
+[2026-05-13 11:33:10] Encerramento da votação concluído.
