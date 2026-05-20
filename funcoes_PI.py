@@ -43,6 +43,8 @@ def validar_cpf(cpf):
 
 
 def cadastro_eleitores():
+    print("\n=== CADASTRAR ELEITOR ===")
+
     nome = input("Digite Seu nome completo: ").strip()
     while nome == "":
         print("Nome inválido. Tente novamente.")
@@ -157,6 +159,7 @@ def cadastro_eleitores():
 
 
 def buscar_eleitor():
+    print("\n=== BUSCAR ELEITOR ===")
 
     cpf = input("Digite o CPF para buscar: ")
     cpf = cpf.strip()
@@ -194,6 +197,9 @@ def buscar_eleitor():
 
 
 def listar_eleitores():
+    print("\n=== LISTA DE ELEITORES ===")
+
+    
     sql = """
         SELECT cpf, nome_completo, titulo_eleitor, is_mesario, ja_votou
         FROM eleitores
@@ -217,6 +223,8 @@ def listar_eleitores():
 
 
 def remover_eleitores():
+    print("\n=== REMOÇÃO DE ELEITORES ===")
+
     cpf = input("Digite o CPF do eleitor que deseja remover: ")
     cpf = cpf.strip()
     cpf = cpf.replace("-", "")
@@ -251,6 +259,8 @@ def remover_eleitores():
 
 
 def listar_mesarios():
+    print("\n=== LISTA DE MESÁRIOS ===")
+
     sql = """
         SELECT cpf, nome_completo, titulo_eleitor, is_mesario, ja_votou
         FROM eleitores WHERE is_mesario = 1
@@ -271,6 +281,8 @@ def listar_mesarios():
 
 
 def cadastrar_candidato():
+    print("\n=== CADASTRAR CANDIDATO ===")
+
     nome = input("Digite o nome do candidato: ").strip()
     while nome == "":
         print("O nome do candidato deve ser preenchido. Tente novamente.")
@@ -326,6 +338,8 @@ def numero_candidato(numero):
     
         
 def buscar_candidatos():
+    print("\n=== BUSCAR CANDIDATOS ===")
+
     numero = input("Digite o número do candidato que deseja buscar: ").strip()
     while not numero.isdigit():
         print("Busca inválida, digite apenas números. tente novamente.")
@@ -351,6 +365,8 @@ def buscar_candidatos():
 
 
 def listar_candidatos():
+    print("\n=== LISTA DE CANDIDATOS ===")
+
     sql = """
         SELECT nome, numero, partido
         FROM candidatos
@@ -369,6 +385,8 @@ def listar_candidatos():
 
 
 def remover_candidato():
+    print("\n=== REMOÇÃO DE CANDIDATOS ===")
+
     numero = input("Digite o número do candidato que deseja remover: ")
     numero = numero.strip()
     while not numero.isdigit():
@@ -916,3 +934,47 @@ def editar_eleitor():
     print("Eleitor atualizado com sucesso!")
 
 
+
+def tornar_mesario():
+    print("\n=== TORNAR ELEITOR MESÁRIO ===")
+
+    cpf = input("Digite o CPF do eleitor: ").strip()
+    cpf = cpf.replace('.', '')
+    cpf = cpf.replace('-', '')
+
+    while not cpf.isdigit():
+        print("CPF inválido. Digite apenas números")
+        cpf = input("Digite o CPF do eleitor: ").strip()
+        cpf = cpf.replace('.', '')
+        cpf = cpf.replace('-', '')
+
+    sql = "SELECT id, nome_completo, is_mesario FROM eleitores WHERE cpf = %s"
+    conexao.cursor.execute(sql, (cpf,))
+    eleitor = conexao.cursor.fetchone()
+
+    if not eleitor:
+        print("Eleitor não encontrado.")
+        registrar_log("Tentativa de tornar mesário um eleitor não existente.")
+        return
+    
+    if eleitor[2] == 1:
+        print(f"{eleitor[1]} já é mesário.")
+        return
+    
+    confirmacao = input(f"Deseja tornar {eleitor[1]} um mesário? Sim (S) ou Não (N)").strip().upper()
+
+    while confirmacao not in ["S", "N"]:
+        print("Digite S ou N.")
+        confirmacao = input("(S/N): ").strip().upper()
+
+    if confirmacao != "S":
+        print("Operação cancelada.")
+        return
+    
+    sql_update = "UPDATE eleitores SET is_mesario = TRUE WHERE id = %s"
+    conexao.cursor.execute(sql_update, (eleitor[0],))
+    conexao.conexao.commit()
+
+    print(f"{eleitor[1]} agora é mesário!")
+
+    registrar_log("Eleitor promovido a mesário.")

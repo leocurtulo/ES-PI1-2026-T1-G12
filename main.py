@@ -37,7 +37,7 @@ while (opc != 0):
                                 case 5:
                                     funcoes_PI.remover_eleitores()
                                 case 6:
-                                    print("Tornar eleitor mesário")
+                                    funcoes_PI.tornar_mesario()
                                 case 7:
                                     funcoes_PI.listar_mesarios()
                                 case 0:

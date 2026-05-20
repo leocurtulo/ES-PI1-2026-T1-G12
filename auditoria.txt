@@ -4,3 +4,10 @@
 [2026-05-13 11:32:06] Tentativa de votar novamente (voto duplo).
 [2026-05-13 11:32:28] Tentativa de acesso negado.
 [2026-05-13 11:33:10] Encerramento da votação concluído.
+[2026-05-13 16:25:21] Abertura da votação concluída.
+[2026-05-13 16:35:46] Abertura da votação concluída.
+[2026-05-13 16:39:37] Abertura da votação concluída.
+[2026-05-13 16:40:00] Abertura da votação concluída.
+[2026-05-13 16:40:56] Voto realizado.
+[2026-05-13 16:42:10] Encerramento da votação concluído.
+[2026-05-19 21:40:20] Eleitor promovido a mesário.
