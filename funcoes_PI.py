@@ -978,3 +978,68 @@ def tornar_mesario():
     print(f"{eleitor[1]} agora é mesário!")
 
     registrar_log("Eleitor promovido a mesário.")
+
+
+def boletim_urna():
+    print("\n=== BOLETIM DE URNA ===")
+
+    sql = """ 
+        SELECT c.nome, c.numero, c.partido, COUNT(v.id) as total
+        FROM candidatos c
+        LEFT JOIN voto v ON c.id = v.candidato_id
+        GROUP BY c.id
+        ORDER BY c.nome
+
+
+    """
+
+    conexao.cursor.execute(sql)
+    resultados = conexao.cursor.fetchall()
+
+    maior_votos = -1
+    vencedores = []
+
+    for c in resultados:
+        print(f"{c[0]} ({c[1]}) - {c[2]} | {c[3]} voto(s)")
+
+        if c[3] > maior_votos:
+            maior_votos = c[3]
+            vencedores = [c]
+
+        elif c[3] == maior_votos:
+            vencedores.append(c)
+        
+    print("\n=== RESULTADO FINAL ===")
+
+    if len(vencedores) == 1:
+        v = vencedores[0]
+        print(f"VENCEDOR: {v[0]} ({v[1]}) - {v[2]}")
+        print(f"Total de votos: {v[3]}")
+
+    else:
+        print("EMPATE ENTRE:")
+        for v in vencedores:
+            print(f"{v[0]} ({v[1]}) - {v[2]} | {v[3]} votos")
+
+
+        
+
+def estatisticas_comparecimento():
+    print("\n=== ESTATÍSTICAS DE COMPARECIMENTO ===")
+
+    sql_total = "SELECT COUNT(*) FROM eleitores"
+    conexao.cursor.execute(sql_total)
+    total = conexao.cursor.fetchone()[0]
+
+    sql_votaram = "SELECT COUNT(*) FROM eleitores WHERE ja_votou = 1"
+    conexao.cursor.execute(sql_votaram)
+    votaram = conexao.cursor.fetchone()[0]
+
+    if total == 0:
+        print("Nenhum eleitor cadastrado.")
+        return
+    
+    percentual = (votaram / total) * 100
+    print(f"Total de eleitores: {total}")
+    print(f"Eleitores que votaram: {votaram}")
+    print(f"Comparecimento: {percentual:.2f}%")

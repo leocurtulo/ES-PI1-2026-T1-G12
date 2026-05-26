@@ -119,9 +119,9 @@ while (opc != 0):
 
                                 match op:
                                     case 1:
-                                        print("Boletim")
+                                        funcoes_PI.boletim_urna()
                                     case 2:
-                                        print("Estatísticas")
+                                        funcoes_PI.estatisticas_comparecimento()
                                     case 3:
                                         print("Partido")
                                     case 4:
