@@ -108,24 +108,28 @@ while (opc != 0):
                                     print("Opção inválida.")
 
                     case 5:
-                        op = -1
-                        while op != 0:
-                            op = menu.menu_resultados()
-                        
+                        if funcoes_PI.votacao_aberta:
+                            print("A votação ainda está em andamento. Os resultados estarão disponíveis apenas ao final da votação.")
 
-                            match op:
-                                case 1:
-                                    print("Boletim")
-                                case 2:
-                                    print("Estatísticas")
-                                case 3:
-                                    print("Partido")
-                                case 4:
-                                    print("Integridade")
-                                case 0:
-                                    print("Voltando...")
-                                case _:
-                                    print("Opção inválida.")
+                        else:
+                            op = -1
+                            while op != 0:
+                                op = menu.menu_resultados()
+                            
+
+                                match op:
+                                    case 1:
+                                        print("Boletim")
+                                    case 2:
+                                        print("Estatísticas")
+                                    case 3:
+                                        print("Partido")
+                                    case 4:
+                                        print("Integridade")
+                                    case 0:
+                                        print("Voltando...")
+                                    case _:
+                                        print("Opção inválida.")
 
 
 

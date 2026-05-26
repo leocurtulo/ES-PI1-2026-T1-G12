@@ -1,3 +1,12 @@
+def ler_opcao():
+    opcao = input("Escolha: ").strip()
+
+    while not opcao.isdigit():
+        print("Digite apenas números.")
+        opcao = input("Escolha: ").strip()
+    return int(opcao)
+
+
 
 def menu_principal():
     print("="*40)
@@ -7,8 +16,7 @@ def menu_principal():
     print("2 - Votação")
     print("0 - Sair")
     print("="*40)
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_gerenciamento():
@@ -19,8 +27,7 @@ def menu_gerenciamento():
     print("2 - Candidatos")
     print("0 - Voltar")
     print("="*40)
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_eleitores():
@@ -37,8 +44,7 @@ def menu_eleitores():
     print("0 - Voltar")
     print("="*40)
 
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_candidatos():
@@ -53,8 +59,7 @@ def menu_candidatos():
     print("0 - Voltar")
     print("="*40)
 
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_votacao():
@@ -69,8 +74,7 @@ def menu_votacao():
     print("0 - Voltar")
     print("="*40)
 
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_abertura():
@@ -83,7 +87,7 @@ def menu_abertura():
     print("="*40)
 
     opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_auditoria():
@@ -95,8 +99,7 @@ def menu_auditoria():
     print("0 - Voltar")
     print("="*40)
 
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_resultados():
@@ -110,8 +113,7 @@ def menu_resultados():
     print("0 - Voltar")
     print("="*40)
 
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
 
 
 def menu_mesarios():
@@ -126,5 +128,4 @@ def menu_mesarios():
     print("0 - Voltar")
     print("="*40)
 
-    opcao = int(input("Escolha: "))
-    return opcao
+    return ler_opcao()
