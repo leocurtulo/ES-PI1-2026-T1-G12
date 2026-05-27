@@ -1043,3 +1043,62 @@ def estatisticas_comparecimento():
     print(f"Total de eleitores: {total}")
     print(f"Eleitores que votaram: {votaram}")
     print(f"Comparecimento: {percentual:.2f}%")
+
+def votos_por_partido():
+    """
+    Exibe a soma de votos por partido.
+    """
+
+    sql = """
+        SELECT 
+            c.partido, 
+            COUNT(v.id) AS total_votos
+        FROM candidatos c
+        LEFT JOIN voto v ON c.id = v.candidato_id
+        GROUP BY c.partido
+        ORDER BY total_votos DESC
+    """
+
+    conexao.cursor.execute(sql)
+    resultados = conexao.cursor.fetchall()
+
+    print("\n=== VOTOS POR PARTIDO ===")
+
+    if not resultados:
+        print("Nenhum dado disponível.")
+        return
+
+    for r in resultados:
+        partido = r[0]
+        votos = r[1]
+        print(f"Partido: {partido} -> {votos} votos") 
+    0
+
+def validar_integridade():
+    """
+    Verifica se o número de votos registrados é igual 
+    ao número de eleitores que já votaram.
+    """
+
+    # contar votos
+    sql_votos = "SELECT COUNT(*) FROM voto"
+    conexao.cursor.execute(sql_votos)
+    total_votos = conexao.cursor.fetchone()[0]
+
+    # contar eleitores que votaram
+    sql_eleitores = "SELECT COUNT(*) FROM eleitores WHERE ja_votou = TRUE"
+    conexao.cursor.execute(sql_eleitores)
+    total_eleitores = conexao.cursor.fetchone()[0]
+
+    print("\n=== VALIDAÇÃO DE INTEGRIDADE ===")
+
+    print(f"Total de votos registrados: {total_votos}")
+    print(f"Total de eleitores que votaram: {total_eleitores}")
+
+    # comparação
+    if total_votos == total_eleitores:
+        print("\nINTEGRIDADE CONFIRMADA")
+        print("Não há inconsistências no sistema.")
+    else:
+        print("\nERRO DE INTEGRIDADE")
+        print("Há divergência entre votos e eleitores.")
