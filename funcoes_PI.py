@@ -63,6 +63,7 @@ def criptografar(texto):
 def descriptografar(texto):
     texto = texto.upper()
     
+    
     if MATRIZ_INV is None:
         return "Erro: matriz não possui inversa"
     
@@ -248,7 +249,8 @@ def buscar_eleitor():
 
     sql = "SELECT * FROM eleitores WHERE cpf = %s"
 
-    valores = (cpf,)
+    cpf_cripto = criptografar(cpf)
+    valores = (cpf_cripto,)
 
     conexao.cursor.execute(sql, valores)
 
@@ -288,8 +290,9 @@ def listar_eleitores():
     
     for e in resultados:
         if e[3] == 0:
+            cpf_real = descriptografar(e[0])
             print(f"\nNome: {e[1]}")
-            print(f"CPF: {e[0]}")
+            print(f"CPF: {cpf_real}")
             print(f"Título: {e[2]}")
             print(f"Mesário: {'Sim' if e[3]== 1 else 'Não'}")
             print(f"Já votou: {'Sim' if e[4]== 1 else 'Não'}")
@@ -305,8 +308,10 @@ def remover_eleitores():
     cpf = cpf.replace("-", "")
     cpf = cpf.replace(".", "")
 
+    cpf_cripto = criptografar(cpf)
+
     sql = "SELECT nome_completo FROM eleitores WHERE cpf = %s"
-    conexao.cursor.execute(sql, (cpf,))
+    conexao.cursor.execute(sql, (cpf_cripto,))
     eleitor = conexao.cursor.fetchone()
 
     if not eleitor:
@@ -325,7 +330,7 @@ def remover_eleitores():
         return
     
     sql_delete = "DELETE FROM eleitores WHERE cpf = %s"
-    conexao.cursor.execute(sql_delete, (cpf,))
+    conexao.cursor.execute(sql_delete, (cpf_cripto,))
     conexao.conexao.commit()
 
     print("Eleitor removido com sucesso!")
@@ -348,8 +353,9 @@ def listar_mesarios():
         return
     
     for e in resultados:
+        cpf_real = descriptografar(e[0])
         print(f"\nNome: {e[1]}")
-        print(f"CPF: {e[0]}")
+        print(f"CPF: {cpf_real}")
         print(f"Título: {e[2]}")
         print(f"Mesário: {'Sim' if e[3]== 1 else 'Não'}")
         print(f"Já votou: {'Sim' if e[4]== 1 else 'Não'}")
@@ -538,12 +544,15 @@ def validar_mesario(titulo_eleitor, cpf4, chave):
     chave_banco = resultado[1]
     is_mesario = resultado[2]
 
+    cpf_real = descriptografar(cpf_banco).strip("A")
+
+
     # valida 4 primeiros dígitos do CPF
-    if cpf_banco[:4] != cpf4:
+    if cpf_real[:4] != cpf4:
         return False
 
     # valida chave
-    chave_real = descriptografar(chave_banco)
+    chave_real = descriptografar(chave_banco).strip("A")
     if chave_real != chave:
         return False
 
@@ -718,25 +727,28 @@ def votar():
 
    
     sql = """
-        SELECT id, ja_votou, chave_acesso
+        SELECT id, ja_votou, chave_acesso, cpf
         FROM eleitores
         WHERE titulo_eleitor = %s
           
           
     """
-    valores = (titulo, cpf + "%")
+    
 
-    conexao.cursor.execute(sql, valores)
+    conexao.cursor.execute(sql, (titulo,))
     eleitor = conexao.cursor.fetchone()
 
     if not eleitor:
         print("Eleitor não encontrado ou dados inválidos.")
         return
     
-    chave_banco = eleitor[2]
-    chave_real = descriptografar(chave_banco)
-
-    if chave_real != chave:
+    cpf_banco = descriptografar(eleitor[3]).strip("A")
+    if cpf_banco[:4] != cpf:
+        print("CPF incorreto.")
+        return
+    
+    chave_real = descriptografar(eleitor[2]).strip("A")  
+    if chave_real.strip().upper() != chave.strip().upper():
         print("Chave incorreta")
         return
 
@@ -761,8 +773,6 @@ def votar():
     
     conexao.cursor.execute(sql, (numero,))
     candidato = conexao.cursor.fetchone()
-    protocolo_cripto = criptografar(protocolo)
-    conexao.cursor.execute(sql_voto, (candidato_id, data_hora, protocolo_cripto))
 
    
     if candidato:
@@ -800,8 +810,11 @@ def votar():
         numero_str=str(numero).zfill(2)
 
     aleatorio=f"{random.randint(0,99999):05d}"
-    protocolo =f"V{letras}26{numero_str}{aleatorio}"  
-    
+    protocolo =f"V{letras}26{numero_str}{aleatorio}" 
+
+    protocolo_cripto = criptografar(protocolo)
+
+
     data_hora = datetime.now()
 
 
@@ -945,8 +958,9 @@ def editar_eleitor():
         cpf = input("Digite o CPF: ").strip()
         cpf = cpf.replace(".", "").replace("-", "")
 
+    cpf_cripto = criptografar(cpf)
     sql = "SELECT id, nome_completo, titulo_eleitor, is_mesario FROM eleitores WHERE cpf = %s"
-    conexao.cursor.execute(sql, (cpf,))
+    conexao.cursor.execute(sql, (cpf_cripto,))
     eleitor = conexao.cursor.fetchone()
 
     if not eleitor:
@@ -1035,8 +1049,9 @@ def tornar_mesario():
         cpf = cpf.replace('.', '')
         cpf = cpf.replace('-', '')
 
+    cpf_cripto = criptografar(cpf)
     sql = "SELECT id, nome_completo, is_mesario FROM eleitores WHERE cpf = %s"
-    conexao.cursor.execute(sql, (cpf,))
+    conexao.cursor.execute(sql, (cpf_cripto,))
     eleitor = conexao.cursor.fetchone()
 
     if not eleitor:
@@ -1132,9 +1147,6 @@ def estatisticas_comparecimento():
     print(f"Comparecimento: {percentual:.2f}%")
 
 def votos_por_partido():
-    """
-    Exibe a soma de votos por partido.
-    """
 
     sql = """
         SELECT 
@@ -1159,20 +1171,16 @@ def votos_por_partido():
         partido = r[0]
         votos = r[1]
         print(f"Partido: {partido} -> {votos} votos") 
-    0
+    
 
 def validar_integridade():
-    """
-    Verifica se o número de votos registrados é igual 
-    ao número de eleitores que já votaram.
-    """
 
-    # contar votos
+    
     sql_votos = "SELECT COUNT(*) FROM voto"
     conexao.cursor.execute(sql_votos)
     total_votos = conexao.cursor.fetchone()[0]
 
-    # contar eleitores que votaram
+    
     sql_eleitores = "SELECT COUNT(*) FROM eleitores WHERE ja_votou = TRUE"
     conexao.cursor.execute(sql_eleitores)
     total_eleitores = conexao.cursor.fetchone()[0]
@@ -1182,7 +1190,7 @@ def validar_integridade():
     print(f"Total de votos registrados: {total_votos}")
     print(f"Total de eleitores que votaram: {total_eleitores}")
 
-    # comparação
+    
     if total_votos == total_eleitores:
         print("\nINTEGRIDADE CONFIRMADA")
         print("Não há inconsistências no sistema.")

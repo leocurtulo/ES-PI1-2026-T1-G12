@@ -123,9 +123,9 @@ while (opc != 0):
                                     case 2:
                                         funcoes_PI.estatisticas_comparecimento()
                                     case 3:
-                                        print("Partido")
+                                        funcoes_PI.votos_por_partido()
                                     case 4:
-                                        print("Integridade")
+                                        funcoes_PI.validar_integridade()
                                     case 0:
                                         print("Voltando...")
                                     case _:

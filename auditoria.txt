@@ -11,3 +11,13 @@
 [2026-05-13 16:40:56] Voto realizado.
 [2026-05-13 16:42:10] Encerramento da votação concluído.
 [2026-05-19 21:40:20] Eleitor promovido a mesário.
+[2026-05-27 08:19:20] Tentativa de tornar mesário um eleitor não existente.
+[2026-05-27 09:46:25] Eleitor promovido a mesário.
+[2026-05-27 09:56:45] Abertura da votação concluída.
+[2026-05-27 10:00:26] Abertura da votação concluída.
+[2026-05-27 10:07:50] Voto realizado.
+[2026-05-27 10:08:52] Encerramento da votação concluído.
+[2026-05-27 10:12:54] Abertura da votação concluída.
+[2026-05-27 10:18:22] Abertura da votação concluída.
+[2026-05-27 10:24:48] Voto realizado.
+[2026-05-27 10:25:37] Encerramento da votação concluído.
