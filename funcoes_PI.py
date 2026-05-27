@@ -5,7 +5,80 @@ from datetime import datetime
 votacao_aberta = False
 import string
 
+LETRAS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
+MATRIZ = [[3, 5], [1, 2]]
+
+def determinante_matriz(mat):
+    return (mat[0][0] * mat[1][1] - mat[0][1] * mat[1][0]) % 36
+
+def inversa_modular(mat, mod):
+    det = determinante_matriz(mat)
+    
+    det_inv = -1
+    for i in range(mod):
+        if (det * i) % mod == 1:
+            det_inv = i
+            break
+    
+    if det_inv == -1:
+        return None
+    
+    inv = [[0, 0], [0, 0]]
+    inv[0][0] = (mat[1][1] * det_inv) % mod
+    inv[0][1] = (-mat[0][1] * det_inv) % mod
+    inv[1][0] = (-mat[1][0] * det_inv) % mod
+    inv[1][1] = (mat[0][0] * det_inv) % mod
+    
+    return inv
+
+MATRIZ_INV = inversa_modular(MATRIZ, 36)
+
+def cifrar_bloco(a, b, mat):
+    tam = len(LETRAS)
+    x = (mat[0][0] * a + mat[0][1] * b) % tam
+    y = (mat[1][0] * a + mat[1][1] * b) % tam
+    return x, y
+
+def criptografar(texto):
+    texto = texto.upper()
+    
+    if len(texto) % 2 != 0:
+        texto += "A"
+    
+    cifrado = ""
+    i = 0
+    
+    while i < len(texto):
+        a = LETRAS.index(texto[i])
+        b = LETRAS.index(texto[i + 1])
+        
+        x, y = cifrar_bloco(a, b, MATRIZ)
+        
+        cifrado += LETRAS[x] + LETRAS[y]
+        i += 2
+    
+    return cifrado
+
+def descriptografar(texto):
+    texto = texto.upper()
+    
+    if MATRIZ_INV is None:
+        return "Erro: matriz não possui inversa"
+    
+    original = ""
+    i = 0
+    
+    while i < len(texto):
+        a = LETRAS.index(texto[i])
+        b = LETRAS.index(texto[i + 1])
+        
+        x, y = cifrar_bloco(a, b, MATRIZ_INV)
+        
+        original += LETRAS[x] + LETRAS[y]
+        i += 2
+    
+    return original
 
 def validar_cpf(cpf):
     cpf = cpf.strip()
@@ -113,7 +186,7 @@ def cadastro_eleitores():
     print("CPF válido.")
 
     chave = chave_acesso(nome)
-
+    chave_cripto = criptografar(chave)
     while chave == "":
         print("Nome inválido. Digite o nome e o sobrenome.")
         nome = input("Digite Seu nome completo: ").strip()
@@ -139,12 +212,12 @@ def cadastro_eleitores():
         (cpf, nome_completo, titulo_eleitor, chave_acesso, is_mesario)
         VALUES (%s, %s, %s, %s, %s)
     """
-
+    cpf_cripto = criptografar(cpf)
     valores = (
-        cpf,
+        cpf_cripto,
         nome,
         titulo_eleitor,
-        chave,
+        chave_cripto,
         valor_mesario,
         
     )
@@ -182,12 +255,14 @@ def buscar_eleitor():
     resultado = conexao.cursor.fetchone()
 
     if resultado:
+        cpf_real = descriptografar(resultado[1])
+        chave_real = descriptografar(resultado[4])
         print("Eleitor encontrado!")
         print(f"\nID: {resultado[0]}")
         print(f"Nome Completo: {resultado[2]}")
-        print(f"CPF: {resultado[1]}")
+        print(f"CPF: {cpf_real}")
         print(f"Título de Eleitor: {resultado[3]}")
-        print(f"Chave de Acesso: {resultado[4]}")
+        print(f"Chave de Acesso: {chave_real}")
         print(f"Mesário: {'Sim' if resultado[5] == 1 else 'Não'}")
         
     else:
@@ -468,7 +543,8 @@ def validar_mesario(titulo_eleitor, cpf4, chave):
         return False
 
     # valida chave
-    if chave_banco != chave:
+    chave_real = descriptografar(chave_banco)
+    if chave_real != chave:
         return False
 
     # valida se é mesário
@@ -642,13 +718,13 @@ def votar():
 
    
     sql = """
-        SELECT id, ja_votou
+        SELECT id, ja_votou, chave_acesso
         FROM eleitores
         WHERE titulo_eleitor = %s
-          AND cpf LIKE %s
-          AND chave_acesso = %s
+          
+          
     """
-    valores = (titulo, cpf + "%", chave)
+    valores = (titulo, cpf + "%")
 
     conexao.cursor.execute(sql, valores)
     eleitor = conexao.cursor.fetchone()
@@ -656,6 +732,14 @@ def votar():
     if not eleitor:
         print("Eleitor não encontrado ou dados inválidos.")
         return
+    
+    chave_banco = eleitor[2]
+    chave_real = descriptografar(chave_banco)
+
+    if chave_real != chave:
+        print("Chave incorreta")
+        return
+
 
     if eleitor[1] == 1:
         print("Este eleitor já votou.")
@@ -674,8 +758,11 @@ def votar():
         FROM candidatos
         WHERE numero = %s
     """
+    
     conexao.cursor.execute(sql, (numero,))
     candidato = conexao.cursor.fetchone()
+    protocolo_cripto = criptografar(protocolo)
+    conexao.cursor.execute(sql_voto, (candidato_id, data_hora, protocolo_cripto))
 
    
     if candidato:
@@ -1102,3 +1189,7 @@ def validar_integridade():
     else:
         print("\nERRO DE INTEGRIDADE")
         print("Há divergência entre votos e eleitores.")
+
+
+
+
