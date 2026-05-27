@@ -21,3 +21,32 @@
 [2026-05-27 10:18:22] Abertura da votação concluída.
 [2026-05-27 10:24:48] Voto realizado.
 [2026-05-27 10:25:37] Encerramento da votação concluído.
+[2026-05-27 11:15:35] Abertura da votação concluída.
+[2026-05-27 11:17:08] Voto realizado.
+[2026-05-27 11:18:17] Voto realizado.
+[2026-05-27 11:18:41] Encerramento da votação concluído.
+[2026-05-27 16:01:04] Votação iniciada com sucesso. Votos zerados.
+[2026-05-27 16:01:04] Abertura da votação concluída.
+[2026-05-27 16:03:57] Voto realizado.
+[2026-05-27 16:04:28] Voto realizado.
+[2026-05-27 16:05:23] Encerramento da votação concluído.
+[2026-05-27 16:39:43] Votação iniciada com sucesso. Votos zerados.
+[2026-05-27 16:39:43] Abertura da votação concluída.
+[2026-05-27 16:41:08] Voto realizado.
+[2026-05-27 16:52:44] Votação iniciada com sucesso. Votos zerados.
+[2026-05-27 16:52:44] Abertura da votação concluída.
+[2026-05-27 16:53:19] Voto realizado.
+[2026-05-27 16:54:18] Voto realizado.
+[2026-05-27 16:55:00] Encerramento da votação concluído.
+[2026-05-27 17:04:00] Votação iniciada com sucesso. Votos zerados.
+[2026-05-27 17:04:00] Abertura da votação concluída.
+[2026-05-27 17:04:40] Voto realizado.
+[2026-05-27 17:05:21] Voto realizado.
+[2026-05-27 17:07:18] Encerramento da votação concluído.
+[2026-05-27 17:15:33] Votação iniciada com sucesso. Votos zerados.
+[2026-05-27 17:15:33] Abertura da votação concluída.
+[2026-05-27 17:16:01] Voto realizado.
+[2026-05-27 17:16:36] Encerramento da votação concluído.
+[2026-05-27 18:00:37] Votação iniciada com sucesso. Votos zerados.
+[2026-05-27 18:00:37] Abertura da votação concluída.
+[2026-05-27 18:01:09] Encerramento da votação concluído.

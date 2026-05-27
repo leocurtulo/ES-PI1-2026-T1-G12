@@ -120,8 +120,8 @@ def cadastro_eleitores():
     print("\n=== CADASTRAR ELEITOR ===")
 
     nome = input("Digite Seu nome completo: ").strip()
-    while nome == "":
-        print("Nome inválido. Tente novamente.")
+    while nome == "" or not nome.replace(" ", "").isalpha():
+        print("Nome inválido. Tente digitar sem acento.")
         nome = input("Digite Seu nome completo: ").strip()
     
 
@@ -571,17 +571,26 @@ def validar_mesario(titulo_eleitor, cpf4, chave):
 def zerezima():
     print("\n=== REALIZANDO A ZERÉZIMA ===")
 
-    conexao.cursor.execute("DELETE FROM voto")# limpar votos
+    conexao.cursor.execute("DELETE FROM voto")
+    conexao.cursor.execute("UPDATE eleitores SET ja_votou = FALSE")
+
+
     conexao.conexao.commit()
 
-    sql = "SELECT nome, numero FROM candidatos ORDER BY nome"
+    sql = "SELECT nome, numero FROM candidatos ORDER BY nome ASC"
     conexao.cursor.execute(sql)
     candidatos = conexao.cursor.fetchall()
 
-    for c in candidatos:
-        print(f"{c[0]} ({c[1]}) - 0 votos")
+    if not candidatos:
+        print("Nenhum candidato cadastrado.")
+    else:
+        for c in candidatos:
+            print(f"{c[0]} ({c[1]}) | 0 votos")
 
-    print("\nZerézima realizada com sucesso, todos os votos foram zerados.")
+    
+
+    print("\nZerézima realizada com sucesso. Sistema pronto para votação.")
+    registrar_log("Votação iniciada com sucesso. Votos zerados.")
 
 
 
@@ -764,6 +773,7 @@ def votar():
     while not numero.isdigit():
         print("Número inválido. Digite apenas números.")
         numero = input("Digite o número do candidato: ").strip()
+    numero = int(numero)
 
     sql = """
         SELECT id, nome, partido
@@ -775,33 +785,70 @@ def votar():
     candidato = conexao.cursor.fetchone()
 
    
+    
     if candidato:
         print(f"Candidato: {candidato[1]} - {candidato[2]}")
-        confirmar = input("Confirmar voto? SIM (S) ou NÃO(N): ").upper().strip()
-
-        while confirmar not in ["S", "N"]:
-            print("Digite S para SIM ou N para NÃO.")
-            confirmar = input("(S/N): ").strip().upper()
-
-
-        if confirmar != "S":
-            print("Voto cancelado.")
-            return
-        candidato_id = candidato[0]
-
-
+        confirmar = input("Confirmar voto? SIM (S) ou NÃO (N): ").strip().upper()
     else:
         print("Número inválido. Voto será NULO.")
-        confirmar = input("Confirmar voto nulo? SIM (S) ou NÃO(N): ").upper().strip()
+        candidato = None
+        confirmar = input("Confirmar voto nulo? SIM (S) ou NÃO (N): ").strip().upper()
+
+    
+    if confirmar == "SIM":
+        confirmar = "S"
+    elif confirmar in ["NAO", "NÃO"]:
+        confirmar = "N"
+
+    while confirmar not in ["S", "N"]:
+        print("Digite S para SIM ou N para NÃO.")
+        confirmar = input("(S/N): ").strip().upper()
+
+        if confirmar == "SIM":
+            confirmar = "S"
+        elif confirmar in ["NAO", "NÃO"]:
+            confirmar = "N"
+
+    
+    while confirmar != "S":
+
+        numero = input("\nDigite o número do candidato: ").strip()
+
+        while not numero.isdigit():
+            print("Número inválido.")
+            numero = input("Digite o número do candidato: ").strip()
+
+        conexao.cursor.execute(sql, (numero,))
+        candidato = conexao.cursor.fetchone()
+
+        if candidato:
+            print(f"Candidato: {candidato[1]} - {candidato[2]}")
+            confirmar = input("Confirmar voto? SIM (S) ou NÃO (N): ").strip().upper()
+        else:
+            print("Número inválido. Voto será NULO.")
+            candidato = None
+            confirmar = input("Confirmar voto nulo? SIM (S) ou NÃO (N): ").strip().upper()
+
+        if confirmar == "SIM":
+            confirmar = "S"
+        elif confirmar in ["NAO", "NÃO"]:
+            confirmar = "N"
 
         while confirmar not in ["S", "N"]:
             print("Digite S para SIM ou N para NÃO.")
             confirmar = input("(S/N): ").strip().upper()
 
-        if confirmar != "S":
-            print("Voto cancelado.")
-            return
-        candidato_id = None  
+            if confirmar == "SIM":
+                confirmar = "S"
+            elif confirmar in ["NAO", "NÃO"]:
+                confirmar = "N"
+
+    if candidato:
+        candidato_id = candidato[0]
+    else:
+        candidato_id = None                
+
+
     
     letras=''.join(random.choice(string.ascii_uppercase) for _ in range(2))
     if candidato_id is None:
@@ -822,7 +869,7 @@ def votar():
         INSERT INTO voto (candidato_id, data_hora, protocolo)
         VALUES (%s, %s, %s)
     """
-    conexao.cursor.execute(sql_voto, (candidato_id, data_hora, protocolo))
+    conexao.cursor.execute(sql_voto, (candidato_id, data_hora, protocolo_cripto))
 
     
     sql_update = "UPDATE eleitores SET ja_votou = TRUE WHERE id = %s"
@@ -1110,6 +1157,11 @@ def boletim_urna():
 
         elif c[3] == maior_votos:
             vencedores.append(c)
+    
+    sql_nulo = "SELECT COUNT(*) FROM voto WHERE candidato_id IS NULL"
+    conexao.cursor.execute(sql_nulo)
+    votos_nulos = conexao.cursor.fetchone()[0]
+    print(f"NULO - {votos_nulos} voto (s)")
         
     print("\n=== RESULTADO FINAL ===")
 
@@ -1201,3 +1253,23 @@ def validar_integridade():
 
 
 
+def exibir_protocolos():
+    print("\n=== PROTOCOLOS DE VOTAÇÃO ===")
+    
+    
+    conexao.cursor.execute("SELECT protocolo FROM voto")
+    resultados = conexao.cursor.fetchall()
+
+    if not resultados:
+        print("Nenhum protocolo encontrado.")
+        return
+    
+    protocolos = []
+    for p in resultados:
+        protocolo_real = descriptografar(p[0]).strip("A")
+        protocolos.append(protocolo_real)
+    
+    protocolos.sort()
+
+    for protocolo in protocolos:
+        print(protocolo)

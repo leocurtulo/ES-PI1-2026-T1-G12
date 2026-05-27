@@ -1,3 +1,8 @@
+import os
+
+def limpar_tela():
+    os.system("cls" if os.name == "nt" else clear)
+
 def ler_opcao():
     opcao = input("Escolha: ").strip()
 
@@ -20,6 +25,7 @@ def menu_principal():
 
 
 def menu_gerenciamento():
+    limpar_tela()
     print("="*40)
     print(" GERENCIAMENTO ".center(40))
     print("="*40)
@@ -31,6 +37,7 @@ def menu_gerenciamento():
 
 
 def menu_eleitores():
+    limpar_tela()
     print("="*40)
     print(" ELEITORES ".center(40))
     print("="*40)
@@ -48,6 +55,7 @@ def menu_eleitores():
 
 
 def menu_candidatos():
+    limpar_tela()
     print("="*40)
     print(" CANDIDATOS ".center(40))
     print("="*40)
@@ -63,6 +71,7 @@ def menu_candidatos():
 
 
 def menu_votacao():
+    limpar_tela()
     print("="*40)
     print(" VOTAÇÃO ".center(40))
     print("="*40)
@@ -78,6 +87,7 @@ def menu_votacao():
 
 
 def menu_abertura():
+    limpar_tela()
     print("="*40)
     print(" ABERTURA ".center(40))
     print("="*40)
@@ -91,6 +101,7 @@ def menu_abertura():
 
 
 def menu_auditoria():
+    limpar_tela()
     print("="*40)
     print(" AUDITORIA ".center(40))
     print("="*40)
@@ -103,6 +114,7 @@ def menu_auditoria():
 
 
 def menu_resultados():
+    limpar_tela()
     print("="*40)
     print(" RESULTADOS ".center(40))
     print("="*40)
@@ -129,3 +141,31 @@ def menu_mesarios():
     print("="*40)
 
     return ler_opcao()
+
+
+def menu_votacao_fechada():
+    limpar_tela()
+    print("="*40)
+    print(" VOTAÇÃO ".center(40))
+    print("="*40)
+    print("1 - Abrir sistema de votação")
+    print("0 - Voltar")
+    print("="*40)
+
+    return ler_opcao()
+
+def menu_urna():
+    limpar_tela()
+    print("="*40)
+    print(" URNA EM FUNCIONAMENTO ".center(40))
+    print("="*40)
+    print("1 - Votar")
+    print("2 - Encerrar sistema de votação")
+    print("3 - Auditoria")
+    print("4 - Resultados")
+    print("0 - Voltar")
+    print("="*40)
+
+    return ler_opcao()
+
+    
