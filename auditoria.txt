@@ -50,3 +50,38 @@
 [2026-05-27 18:00:37] Votação iniciada com sucesso. Votos zerados.
 [2026-05-27 18:00:37] Abertura da votação concluída.
 [2026-05-27 18:01:09] Encerramento da votação concluído.
+[2026-05-29 13:56:47] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 13:56:47] Abertura da votação concluída.
+[2026-05-29 13:58:12] Voto realizado.
+[2026-05-29 13:59:10] Voto realizado.
+[2026-05-29 13:59:49] Voto realizado.
+[2026-05-29 14:04:16] Voto realizado.
+[2026-05-29 14:05:22] Encerramento da votação concluído.
+[2026-05-29 16:09:44] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 16:09:44] Abertura da votação concluída.
+[2026-05-29 16:14:04] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 16:14:04] Abertura da votação concluída.
+[2026-05-29 16:21:06] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 16:21:06] Abertura da votação concluída.
+[2026-05-29 16:21:59] Voto realizado.
+[2026-05-29 16:22:41] Tentativa de acesso negado.
+[2026-05-29 16:22:56] Tentativa de acesso negado.
+[2026-05-29 16:23:19] Encerramento da votação concluído.
+[2026-05-29 16:23:57] Tentativa de votar novamente (voto duplo).
+[2026-05-29 16:24:20] Encerramento da votação concluído.
+[2026-05-29 16:35:24] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 16:35:24] Abertura da votação concluída.
+[2026-05-29 16:35:49] Voto realizado.
+[2026-05-29 16:36:06] Encerramento da votação concluído.
+[2026-05-29 16:42:11] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 16:42:11] Abertura da votação concluída.
+[2026-05-29 16:43:02] Voto realizado.
+[2026-05-29 16:43:38] Tentativa de votar novamente (voto duplo).
+[2026-05-29 16:44:10] Tentativa de acesso negado.
+[2026-05-29 16:45:12] Encerramento da votação concluído.
+[2026-05-29 16:58:13] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 16:58:13] Abertura da votação concluída.
+[2026-05-29 16:58:44] Tentativa de acesso negado.
+[2026-05-29 16:59:05] Encerramento da votação concluído.
+[2026-05-29 16:59:38] Votação iniciada com sucesso. Votos zerados.
+[2026-05-29 16:59:38] Abertura da votação concluída.

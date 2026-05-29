@@ -168,4 +168,17 @@ def menu_urna():
 
     return ler_opcao()
 
-    
+
+def menu_votacao_inicial():
+    limpar_tela()
+    print("="*40)
+    print(" VOTAÇÃO ".center(40))
+    print("="*40)
+    print("1 - Abrir votação")
+    print("2 - Resultados")
+    print("3 - Auditoria")
+    print("4 - Entrar na urna")
+    print("0 - Voltar")
+    print("="*40)
+
+    return ler_opcao()

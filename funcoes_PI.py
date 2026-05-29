@@ -235,41 +235,49 @@ def cadastro_eleitores():
 def buscar_eleitor():
     print("\n=== BUSCAR ELEITOR ===")
 
-    cpf = input("Digite o CPF para buscar: ")
-    cpf = cpf.strip()
-    cpf = cpf.replace(".", "")
-    cpf = cpf.replace("-", "")
+    continuar = "S"
 
-    while not cpf.isdigit():
-        print("CPF inválido.")
-        cpf = input("Digite o CPF para buscar: ").strip()
+    while continuar == "S":
+        cpf = input("Digite o CPF para buscar: ")
+        cpf = cpf.strip()
         cpf = cpf.replace(".", "")
         cpf = cpf.replace("-", "")
 
+        while not cpf.isdigit():
+            print("CPF inválido.")
+            cpf = input("Digite o CPF para buscar: ").strip()
+            cpf = cpf.replace(".", "")
+            cpf = cpf.replace("-", "")
 
-    sql = "SELECT * FROM eleitores WHERE cpf = %s"
 
-    cpf_cripto = criptografar(cpf)
-    valores = (cpf_cripto,)
+        sql = "SELECT * FROM eleitores WHERE cpf = %s"
 
-    conexao.cursor.execute(sql, valores)
+        cpf_cripto = criptografar(cpf)
+        valores = (cpf_cripto,)
 
-    resultado = conexao.cursor.fetchone()
+        conexao.cursor.execute(sql, valores)
 
-    if resultado:
-        cpf_real = descriptografar(resultado[1])
-        chave_real = descriptografar(resultado[4])
-        print("Eleitor encontrado!")
-        print(f"\nID: {resultado[0]}")
-        print(f"Nome Completo: {resultado[2]}")
-        print(f"CPF: {cpf_real}")
-        print(f"Título de Eleitor: {resultado[3]}")
-        print(f"Chave de Acesso: {chave_real}")
-        print(f"Mesário: {'Sim' if resultado[5] == 1 else 'Não'}")
-        
-    else:
-        print("Eleitor não encontrado.")
+        resultado = conexao.cursor.fetchone()
 
+        if resultado:
+            cpf_real = descriptografar(resultado[1])
+            chave_real = descriptografar(resultado[4])
+            print("Eleitor encontrado!")
+            print(f"\nID: {resultado[0]}")
+            print(f"Nome Completo: {resultado[2]}")
+            print(f"CPF: {cpf_real}")
+            print(f"Título de Eleitor: {resultado[3]}")
+            print(f"Chave de Acesso: {chave_real}")
+            print(f"Mesário: {'Sim' if resultado[5] == 1 else 'Não'}")
+            return
+            
+        else:
+            print("Eleitor não encontrado.")
+            continuar = input("Deseja continuar a busca? (S/N): ").strip().upper()
+            while continuar not in ["S", "N"]:
+                print("Digite S para SIM ou N para NÃO.")
+                continuar = input("(S/N): ").strip().upper()
+    print("Voltando ao menu")
 
 
 
@@ -421,28 +429,39 @@ def numero_candidato(numero):
 def buscar_candidatos():
     print("\n=== BUSCAR CANDIDATOS ===")
 
-    numero = input("Digite o número do candidato que deseja buscar: ").strip()
-    while not numero.isdigit():
-        print("Busca inválida, digite apenas números. tente novamente.")
-        numero = input("Digite o número do candidato que deseja buscar: ").strip()
-        
-    numero_int = int(numero)
-    
-    sql = """
-        SELECT nome, numero, partido
-        FROM candidatos
-        WHERE numero = %s
-    """
-    conexao.cursor.execute(sql, (numero_int,))
-    candidato = conexao.cursor.fetchone()
+    continuar = "S"
 
-    if candidato:
-        print("Candidato encontrado!")
-        print(f"\nNome: {candidato[0]}")
-        print(f"Número: {candidato[1]}")
-        print(f"Partido: {candidato[2]}")
-    else:
-        print("Candidato não encontrado.")
+
+    while continuar == "S":
+        numero = input("Digite o número do candidato que deseja buscar: ").strip()
+        while not numero.isdigit():
+            print("Busca inválida, digite apenas números. tente novamente.")
+            numero = input("Digite o número do candidato que deseja buscar: ").strip()
+            
+        numero_int = int(numero)
+        
+        sql = """
+            SELECT nome, numero, partido
+            FROM candidatos
+            WHERE numero = %s
+        """
+        conexao.cursor.execute(sql, (numero_int,))
+        candidato = conexao.cursor.fetchone()
+
+        if candidato:
+            print("Candidato encontrado!")
+            print(f"\nNome: {candidato[0]}")
+            print(f"Número: {candidato[1]}")
+            print(f"Partido: {candidato[2]}")
+            return
+        else:
+            print("Candidato não encontrado.")
+
+            continuar = input("Deseja continuar a busca? (S/N): ").strip().upper()
+            while continuar not in["S", "N"]:
+                print("Digite S para SIM ou N para NÃO.")
+                continuar = input("(S/N): ").strip().upper()
+    print("Voltando ao menu")
 
 
 def listar_candidatos():
@@ -598,169 +617,209 @@ def zerezima():
 
 
 def abrir_votacao():
-    global votacao_aberta
-
-    titulo = input("Título: ")
-
-    while titulo == "":
-        print("Título inválido. Tente novamente.")
+    titulo_valido = 0
+    while titulo_valido ==0:
         titulo = input("Título: ").strip()
 
+        while titulo == "":
+            print("Título inválido. Tente novamente.")
+            titulo = input("Título: ").strip()
+        sql = "SELECT id, cpf, chave_acesso FROM eleitores WHERE titulo_eleitor = %s AND is_mesario = 1"
+        conexao.cursor.execute(sql,(titulo,))
+        mesario = conexao.cursor.fetchone()
+        conexao.cursor.fetchall()
 
-    cpf4 = input("CPF (4 dígitos): ")
+        if mesario:
+            titulo_valido = 1
+        else:
+            print("Título não encontrado ou não é mesário.")
+    
 
-    while not cpf4.isdigit() or len(cpf4) != 4:
-        print("CPF inválido. Digite 4 números.")
+    cpf_valido = 0
+
+    while cpf_valido == 0:
         cpf4 = input("CPF (4 dígitos): ").strip()
 
+        while not cpf4.isdigit() or len(cpf4) != 4:
+            print("CPF inválido. Digite 4 números.")
+            cpf4 = input("CPF (4 dígitos): ").strip()
+        cpf_banco = descriptografar(mesario[1]).rstrip("A")
 
-    chave = input("Chave: ")
+        if cpf_banco[:4] == cpf4:
+            cpf_valido = 1
+        else:
+            print("CPF incorreto.")
+    
 
-    while chave == "":
-        print("Chave inválida.")
+    chave_valida = 0
+    while chave_valida == 0:
         chave = input("Chave: ").strip()
+
+        while chave == "":
+            print("Chave inválida.")
+            chave = input("Chave: ").strip()
+        chave_real = descriptografar(mesario[2]).rstrip("A")
+        if chave_real.upper() == chave.upper():
+            chave_valida = 1
+        else:
+            print("Chave incorreta.")    
 
     if not validar_mesario(titulo, cpf4, chave):
         print("Acesso negado.")
-        return False
+        return 0
     
-    if votacao_aberta:
-        print("A votação já está aberta.")
-        registrar_log("Tentativa de abrir votação já aberta.")
-        return False
     
 
     print("Mesário autenticado com sucesso!")
     zerezima()
 
-    votacao_aberta = True
 
     registrar_log("Abertura da votação concluída.")
 
     print("Votação Aberta.")
 
-    return True
+    return 1
 
 
 
 
 def encerrar_votacao():
-    global votacao_aberta
 
 
     print("\n=== ENCERRAR VOTAÇÃO ===")
 
-    titulo = input("Título de eleitor: ")
+    titulo_valido = 0
+    while titulo_valido == 0:
+        titulo = input("Título de eleitor: ").strip()
 
-    while titulo == "":
-        print("Título inválido. Tente novamente.")
-        titulo = input("Título: ").strip()
+        while titulo == "":
+            print("Título inválido. Tente novamente.")
+            titulo = input("Título: ").strip()
+        sql = "SELECT id, cpf, chave_acesso FROM eleitores WHERE titulo_eleitor = %s AND is_mesario = 1"
+        conexao.cursor.execute(sql,(titulo,))
+        mesario = conexao.cursor.fetchone()
+        conexao.cursor.fetchall()
 
-        
-    cpf4 = input("4 primeiros dígitos do CPF: ")
+        if mesario:
+            titulo_valido = 1
+        else:
+            print("Título não encontrado ou não é mesário.")
 
-    while not cpf4.isdigit() or len(cpf4) != 4:
-        print("CPF inválido. Digite 4 números.")
-        cpf4 = input("CPF (4 dígitos): ").strip()
 
-    chave = input("Chave de acesso: ")
+    cpf_valido = 0
+    while cpf_valido == 0:    
+        cpf4 = input("4 primeiros dígitos do CPF: ")
 
-    while chave == "":
-        print("Chave inválida.")
-        chave = input("Chave: ").strip()
+        while not cpf4.isdigit() or len(cpf4) != 4:
+            print("CPF inválido. Digite 4 números.")
+            cpf4 = input("CPF (4 dígitos): ").strip()
+        cpf_banco = descriptografar(mesario[1]).rstrip("A")
+        if cpf_banco[:4] == cpf4:
+            cpf_valido = 1
+        else:
+            print("CPF incorreto.")
+
+    chave_valida = 0
+    while chave_valida == 0:
+        chave = input("Chave de acesso: ")
+
+        while chave == "":
+            print("Chave inválida.")
+            chave = input("Chave: ").strip()
+        chave_real = descriptografar(mesario[2]).rstrip("A")
+        if chave_real.upper() == chave.upper():
+            chave_valida = 1
+        else:
+            print("Chave incorreta.") 
+
 
 
     if not validar_mesario(titulo, cpf4, chave):
         print("Validação não realizada")
         registrar_log("Tentativa de acesso negado.")
-        return
+        return 0
     
-    if not votacao_aberta:
-        print("A votação já está encerrada.")
-        return
     
 
     confirm = input("Deseja realmente encerrar? SIM (S) ou NÃO(N): ").strip().upper()
 
     while confirm not in ["S", "N"]:
-        print("Digite apenas SIM ou NÃO.")
-        confirm = input("Deseja realmente encerrar? (SIM/NÃO): ").strip().upper()
+        print("Digite S para SIM ou N para NÃO.")
+        confirm = input("Deseja realmente encerrar? (S/N): ").strip().upper()
 
 
     if confirm != "S":
         print("Encerramento cancelado")
-        return
+        return 0
 
-    chave2 = input("Digite novamente a chave de acesso: ")
+    chave2 = input("Digite novamente a chave de acesso: ").strip()
 
-    while chave == "":
+    while chave2 == "":
         print("Chave inválida.")
         chave2 = input("Digite novamente a chave de acesso: ").strip()
 
     if chave2 != chave:
         print("Chave incorreta")
-        return
+        return 0
     
-    votacao_aberta = False
+    
 
     registrar_log("Encerramento da votação concluído.")
 
     print("Votação encerrada com sucesso!")
-
+    return 1
 
 
 def votar():
-    if not votacao_aberta:
-        print("A votação está fechada.")
-        return
 
     print("\n=== IDENTIFICAÇÃO DO ELEITOR ===")
 
-    titulo = input("Título de eleitor: ").strip()
+    titulo_valido = 0
 
-    while titulo == "":
-        print("Título inválido.")
+
+    while titulo_valido == 0:
         titulo = input("Título de eleitor: ").strip()
 
-    cpf = input("4 primeiros dígitos do CPF: ").strip()
+        while titulo == "":
+            print("Título inválido.")
+            titulo = input("Título de eleitor: ").strip()
+        
+        sql = "SELECT id, ja_votou, chave_acesso, cpf FROM eleitores WHERE titulo_eleitor = %s"
 
-    while not cpf.isdigit() or len(cpf) != 4:
-        print("CPF inválido. Digite 4 números.")
+        conexao.cursor.execute(sql,(titulo,))
+        eleitor = conexao.cursor.fetchone()
+        if eleitor:
+            titulo_valido = 1
+        else:
+            print("Título não encontrado.")
+    
+    cpf_valido = 0
+
+    while cpf_valido == 0:
         cpf = input("4 primeiros dígitos do CPF: ").strip()
 
-    chave = input("Chave de acesso: ").strip()
+        while not cpf.isdigit() or len(cpf) != 4:
+            print("CPF inválido. Digite 4 números.")
+            cpf = input("4 primeiros dígitos do CPF: ").strip()
+        cpf_banco = descriptografar(eleitor[3]).rstrip("A")
+        if cpf_banco[:4] == cpf:
+            cpf_valido = 1
+        else:
+            print("CPF não corresponde ao título.")
+    
+    chave_valida = 0
 
-    while chave == "":
-        print("Chave inválida.")
+    while chave_valida == 0:
         chave = input("Chave de acesso: ").strip()
 
-   
-    sql = """
-        SELECT id, ja_votou, chave_acesso, cpf
-        FROM eleitores
-        WHERE titulo_eleitor = %s
-          
-          
-    """
-    
-
-    conexao.cursor.execute(sql, (titulo,))
-    eleitor = conexao.cursor.fetchone()
-
-    if not eleitor:
-        print("Eleitor não encontrado ou dados inválidos.")
-        return
-    
-    cpf_banco = descriptografar(eleitor[3]).strip("A")
-    if cpf_banco[:4] != cpf:
-        print("CPF incorreto.")
-        return
-    
-    chave_real = descriptografar(eleitor[2]).strip("A")  
-    if chave_real.strip().upper() != chave.strip().upper():
-        print("Chave incorreta")
-        return
-
+        while chave == "":
+            print("Chave inválida.")
+            chave = input("Chave de acesso: ").strip()
+        chave_real = descriptografar(eleitor[2]).rstrip("A")
+        if chave_real.strip().upper() == chave.strip().upper():
+            chave_valida = 1
+        else:
+            print("Chave incorreta.")
 
     if eleitor[1] == 1:
         print("Este eleitor já votou.")

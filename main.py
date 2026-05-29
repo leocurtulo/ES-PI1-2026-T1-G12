@@ -1,6 +1,8 @@
 import menu
 import funcoes_PI
 import os
+votacao_aberta = 0
+votacao_existente = 0
 
 def limpar_principal():
     os.system("cls" if os.name == "nt" else clear)
@@ -101,91 +103,119 @@ while (opc != 0):
 
             while (sub != 0):
                 limpar_principal()
-                if not funcoes_PI.votacao_aberta:
-                    sub = menu.menu_votacao_fechada()
+                
+                sub = menu.menu_votacao_inicial ()
 
-                    match sub:
+                match sub:
 
                     
-                        case 1:
-                            funcoes_PI.abrir_votacao()
-                            input("\nPressione ENTER para continuar...")
+                    case 1:
+                        if votacao_aberta == 0:
+                            abriu = funcoes_PI.abrir_votacao()
+                            if abriu == 1:
+                                votacao_aberta = 1
+
+                        else:
+                            print("A votação já está aberta.")
+                            
+                        input("\nPressione ENTER para continuar...")
                         
-                        case 0:
-                            print("Voltando...")
-
-                        case _:
-                            print("Opção inválida.")
-                            input("Pressione ENTER para continuar...")
-                else:
-                    sub = menu.menu_urna()
-
-                    match sub:
-                        case 1:
-                            funcoes_PI.votar()
-                            input("\nPressione ENTER para continuar...")
-                        case 2:
-                            funcoes_PI.encerrar_votacao()
-                            input("\nPressione ENTER para continuar...")
-                        case 3:
+                    case 2:
+                        if votacao_existente == 1:
                             op = -1
-                            while op != 0:
+                            while op !=0:
+                                limpar_principal()
+                                op = menu.menu_resultados()
+
+                                match op:
+                                    case 1:
+                                        funcoes_PI.boletim_urna()
+                                    case 2:
+                                        funcoes_PI.estatisticas_comparecimento()
+                                    case 3:
+                                        funcoes_PI.votos_por_partido()
+                                    case 4:
+                                        funcoes_PI.validar_integridade()
+                                    case 0:
+                                        print("Voltando...")
+                                    case _:
+                                        print("Opção inválida.")
+                                input("\nPressione ENTER para continuar...")
+                        else:
+                            print("Ainda não estão liberados os resultados.")
+
+                            input("\nPressione ENTER para continuar...")
+                    
+
+                    case 3:
+                        if votacao_existente == 1:
+                            op = -1
+                            while op !=0:
                                 limpar_principal()
                                 op = menu.menu_auditoria()
 
                                 match op:
                                     case 1:
                                         funcoes_PI.exibir_logs()
-                                        input("\nPressione ENTER para continuar...")
                                     case 2:
                                         funcoes_PI.exibir_protocolos()
-                                        input("\nPressione ENTER para continuar...")
                                     case 0:
                                         print("Voltando...")
                                     case _:
                                         print("Opção inválida.")
-                                        input("Pressione ENTER para continuar...")
-                        
-                        case 4:
-                            if funcoes_PI.votacao_aberta:
-                                print("A votação ainda está em andamento.")
                                 input("\nPressione ENTER para continuar...")
-                            else:
-                                op = -1
-                                while op != 0:
-                                    limpar_principal()
-                                    op = menu.menu_resultados()
+                        else:
+                            print("Ainda não há dados para auditoria.")
 
-                                    match op:
-                                        case 1:
-                                            funcoes_PI.boletim_urna()
-                                            input("\nPressione ENTER para continuar...")
-                                        case 2:
-                                            funcoes_PI.estatisticas_comparecimento()
-                                            input("\nPressione ENTER para continuar...")
-                                        case 3:
-                                            funcoes_PI.votos_por_partido()
-                                            input("\nPressione ENTER para continuar...")
-                                        case 4:
-                                            funcoes_PI.validar_integridade()
-                                            input("\nPressione ENTER para continuar...")
-                                        case 0:
-                                            print("Voltando...")
-                                        case _:
-                                            print("Opção inválida.")
-                                            input("Pressione ENTER para continuar...")
-                                
-
-
-
-
-
-                        case 0:
-                            print("Voltando...")
-
-                        case _:
-                            print("Opção inválida.")
                             input("Pressione ENTER para continuar...")
+
+                    case 4:
+                        if votacao_aberta == 1:
+                            op = -1
+                            while op != 0:
+
+                                limpar_principal()
+                                op = menu.menu_urna()
+
+                                match op:
+                                    case 1:
+                                        if votacao_aberta ==1:
+                                            funcoes_PI.votar()
+                                        else:
+                                            print("A votação está fechada.")
+                                        input("\nPressione ENTER para continuar...")
+                                        
+
+                                    case 2:
+                                        encerrou = funcoes_PI.encerrar_votacao()
+                                        
+                                        if encerrou == 1:
+                                            votacao_aberta = 0
+                                            votacao_existente = 1
+                                            op = 0
+                                        
+                                        input("\nPressione ENTER para continuar...")
+
+                                    case 0:
+                                        print("Voltando...")
+
+                                    case _:
+                                        print("Opção inválida.")
+                                        input("Pressione ENTER para continuar...")
+
+                        else:
+                            print("A votação não está aberta.")
+                            input("\nPressione ENTER para continuar...")
+
+                    case 0:
+                        print("Voltando...")
+
+                    case _:
+                        print("Opção inválida.")
+                        input("Pressione ENTER para continuar...")
+
+
+           
 
         # ===== SAIR =====
         case 0:
