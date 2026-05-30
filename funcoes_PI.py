@@ -470,8 +470,8 @@ def cadastrar_candidato():
 def numero_candidato(numero):
     """
     Verifica a autenticidade do numero do candidato
-    args: Número do candidato
-    returns: 1 se existir 0 se não 
+    args: Número do candidato -INT-
+    returns: 1 se existir 0 se não -INT -
     """
     sql = "SELECT 1 FROM candidatos WHERE numero = %s"
     conexao.cursor.execute(sql,(numero,))
@@ -608,8 +608,8 @@ def remover_candidato():
 def chave_acesso(nome_completo):
     """
     gerador da chave de acesso
-    args: nome completo do eleitor
-    return: chave de acesso (Mistura das duas letras do primeiro nome + primeira letra do sobrenome + 4 números aleatorios)
+    args: nome completo do eleitor -STRG-
+    return: chave de acesso (Mistura das duas letras do primeiro nome + primeira letra do sobrenome + 4 números aleatorios) - STRG-
     
     """
     #nome completo
@@ -638,7 +638,7 @@ def validar_mesario(titulo_eleitor, cpf4, chave):
     """
     Valida se os dados informados pertencem a um mesário de fato
     args: titulo de eleitor - INT -, os 4 primeiros digitos do cpf- INT -  e a chave de acesso -STRG-
-    returns: 0 se nao for um mesário, 1 se for um mesário 
+    returns: 0 se nao for um mesário, 1 se for um mesário - INT-
     """
     # consulta no banco de dados o mesario com o titulo de eleitor inserido
     sql = """
@@ -945,6 +945,20 @@ def votar():
         print("Este eleitor já votou.")
         registrar_log("Tentativa de votar novamente (voto duplo).")
         return
+    # candidatos disponíveis
+    print("\n=== CANDIDATOS DISPONÍVEIS ===")
+    
+    sql_candidatos = "SELECT numero, nome, partido FROM candidatos ORDER BY numero"
+    conexao.cursor.execute(sql_candidatos)
+    candidatos = conexao.cursor.fetchall()
+
+    if not candidatos:
+        print("Nenhum candidato cadastrado.")
+    else:
+        for c in candidatos:
+            print(f"{c[0]} - {c[1]} ({c[2]})")
+
+
 
     #numero do candidato que deseja votar
     numero = input("\nDigite o número do candidato: ").strip()

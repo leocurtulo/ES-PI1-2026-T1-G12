@@ -99,3 +99,7 @@
 [2026-05-30 12:40:26] Abertura da votação concluída.
 [2026-05-30 12:44:16] Votação iniciada com sucesso. Votos zerados.
 [2026-05-30 12:44:16] Abertura da votação concluída.
+[2026-05-30 16:57:40] Votação iniciada com sucesso. Votos zerados.
+[2026-05-30 16:57:40] Abertura da votação concluída.
+[2026-05-30 17:02:47] Votação iniciada com sucesso. Votos zerados.
+[2026-05-30 17:02:47] Abertura da votação concluída.
