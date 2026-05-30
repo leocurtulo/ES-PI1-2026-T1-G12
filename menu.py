@@ -161,8 +161,6 @@ def menu_urna():
     print("="*40)
     print("1 - Votar")
     print("2 - Encerrar sistema de votação")
-    print("3 - Auditoria")
-    print("4 - Resultados")
     print("0 - Voltar")
     print("="*40)
 

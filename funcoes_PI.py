@@ -695,7 +695,7 @@ def zerezima():
 
 
     conexao.conexao.commit()
-
+# traz os candidatos do banco de dados em ordem alfabética
     sql = "SELECT nome, numero FROM candidatos ORDER BY nome ASC"
     conexao.cursor.execute(sql)
     candidatos = conexao.cursor.fetchall()
@@ -776,7 +776,7 @@ def abrir_votacao():
         print("Acesso negado.")
         return 0
     
-    
+    #após verificação do mesário realiza a zerézima
 
     print("Mesário autenticado com sucesso!")
     zerezima()
@@ -865,7 +865,7 @@ def encerrar_votacao():
     if confirm != "S":
         print("Encerramento cancelado")
         return 0
-
+# pede novamente a confirmação da chave de acesso
     chave2 = input("Digite novamente a chave de acesso: ").strip()
 
     while chave2 == "":
@@ -1045,14 +1045,14 @@ def votar():
 
     data_hora = datetime.now()
 
-
+# usa o INSERT no banco de dados
     sql_voto = """
         INSERT INTO voto (candidato_id, data_hora, protocolo)
         VALUES (%s, %s, %s)
     """
     conexao.cursor.execute(sql_voto, (candidato_id, data_hora, protocolo_cripto))
 
-    
+    # atualiza o ja_votou 
     sql_update = "UPDATE eleitores SET ja_votou = TRUE WHERE id = %s"
     conexao.cursor.execute(sql_update, (eleitor[0],))
 
@@ -1160,7 +1160,7 @@ def editar_candidato():
             novo_numero_int = int(novo_numero)
         else:
             numero_existe = 0
-
+# novo partido
     partido = input("Digite o novo partido: ").strip()
 
     while partido == "":
@@ -1251,7 +1251,7 @@ def editar_eleitor():
                 titulo = "".join(t for t in titulo if t.isdigit())
         else:
             titulo_existe = 0
-
+# confirmação
     mesario = input("Deseja ser mesário? (S/N): ").strip().upper()
 
     while mesario not in ["S", "N"]:
@@ -1470,7 +1470,7 @@ def validar_integridade():
     print(f"Total de votos registrados: {total_votos}")
     print(f"Total de eleitores que votaram: {total_eleitores}")
 
-    # se for igual as quantidades não existem inconsistencias, caso contrario existe divergencia
+    # se for igual as quantidades não existem inconsistências, caso contrario existe divergência
     if total_votos == total_eleitores:
         print("\nINTEGRIDADE CONFIRMADA")
         print("Não há inconsistências no sistema.")
